@@ -1,4 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
+
+import { requireCapability } from "@/lib/route-guards";
 import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -11,6 +13,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { listGuardianContacts, notifyAttendance, sendFeeReminder } from "@/lib/portal.functions";
 
 export const Route = createFileRoute("/staff/notifications")({
+  beforeLoad: () => requireCapability("parents.notify"),
   head: () => ({
     meta: [
       { title: "Parent Alerts — Joba International Academy" },

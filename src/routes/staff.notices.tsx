@@ -1,4 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
+
+import { requireCapability } from "@/lib/route-guards";
 import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -10,6 +12,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { createNotice, listNotices } from "@/lib/portal.functions";
 
 export const Route = createFileRoute("/staff/notices")({
+  beforeLoad: () => requireCapability("notices.publish"),
   head: () => ({
     meta: [
       { title: "Notice Board — Joba International Academy" },

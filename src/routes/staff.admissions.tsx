@@ -1,4 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
+
+import { requireCapability } from "@/lib/route-guards";
 import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -7,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { enrollStudent, listAdmissions, updateAdmission } from "@/lib/portal.functions";
 
 export const Route = createFileRoute("/staff/admissions")({
+  beforeLoad: () => requireCapability("admissions.review"),
   head: () => ({
     meta: [
       { title: "Admissions Review — Joba International Academy" },
