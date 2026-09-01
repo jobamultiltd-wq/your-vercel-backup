@@ -34,7 +34,7 @@ function ParentLayout() {
       <header className="sticky top-0 z-20 border-b border-border bg-primary text-primary-foreground">
         <div className="mx-auto flex max-w-5xl flex-wrap items-center gap-3 px-4 py-3">
           <Link to="/" className="flex items-center gap-2">
-            <img src={logoAsset.src} alt="School crest" className="h-9 w-9" />
+            <img src={logoAsset.url} alt="School crest" className="h-9 w-9" />
             <span className="font-display text-base font-bold">Parent Portal</span>
           </Link>
           {parent ? (
