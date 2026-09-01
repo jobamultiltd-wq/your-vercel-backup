@@ -1,6 +1,8 @@
 import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 import { useSession } from "@tanstack/react-start/server";
 
+import { can, type Capability } from "./permissions";
+
 /** Service-role Supabase client for the Joba portal database (server-only). */
 export function getDb(): SupabaseClient {
   const url = process.env["PORTAL_SUPABASE_URL"];
