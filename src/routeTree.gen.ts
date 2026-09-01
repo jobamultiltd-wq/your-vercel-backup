@@ -27,6 +27,7 @@ import { Route as StaffNoticesRouteImport } from './routes/staff.notices'
 import { Route as StaffScoresRouteImport } from './routes/staff.scores'
 import { Route as StaffStudentsRouteImport } from './routes/staff.students'
 import { Route as StudentIndexRouteImport } from './routes/student.index'
+import { Route as StudentAccountRouteImport } from './routes/student.account'
 import { Route as StudentAssignmentsRouteImport } from './routes/student.assignments'
 import { Route as StudentFeesRouteImport } from './routes/student.fees'
 import { Route as StudentResultsRouteImport } from './routes/student.results'
@@ -122,6 +123,11 @@ const StudentIndexRoute = StudentIndexRouteImport.update({
   path: '/',
   getParentRoute: () => StudentRoute,
 } as any)
+const StudentAccountRoute = StudentAccountRouteImport.update({
+  id: '/account',
+  path: '/account',
+  getParentRoute: () => StudentRoute,
+} as any)
 const StudentAssignmentsRoute = StudentAssignmentsRouteImport.update({
   id: '/assignments',
   path: '/assignments',
@@ -160,6 +166,7 @@ export interface FileRoutesByFullPath {
   '/staff/notices': typeof StaffNoticesRoute
   '/staff/scores': typeof StaffScoresRoute
   '/staff/students': typeof StaffStudentsRoute
+  '/student/account': typeof StudentAccountRoute
   '/student/assignments': typeof StudentAssignmentsRoute
   '/student/fees': typeof StudentFeesRoute
   '/student/results': typeof StudentResultsRoute
@@ -182,6 +189,7 @@ export interface FileRoutesByTo {
   '/staff/notices': typeof StaffNoticesRoute
   '/staff/scores': typeof StaffScoresRoute
   '/staff/students': typeof StaffStudentsRoute
+  '/student/account': typeof StudentAccountRoute
   '/student/assignments': typeof StudentAssignmentsRoute
   '/student/fees': typeof StudentFeesRoute
   '/student/results': typeof StudentResultsRoute
@@ -207,6 +215,7 @@ export interface FileRoutesById {
   '/staff/notices': typeof StaffNoticesRoute
   '/staff/scores': typeof StaffScoresRoute
   '/staff/students': typeof StaffStudentsRoute
+  '/student/account': typeof StudentAccountRoute
   '/student/assignments': typeof StudentAssignmentsRoute
   '/student/fees': typeof StudentFeesRoute
   '/student/results': typeof StudentResultsRoute
@@ -233,6 +242,7 @@ export interface FileRouteTypes {
     | '/staff/notices'
     | '/staff/scores'
     | '/staff/students'
+    | '/student/account'
     | '/student/assignments'
     | '/student/fees'
     | '/student/results'
@@ -255,6 +265,7 @@ export interface FileRouteTypes {
     | '/staff/notices'
     | '/staff/scores'
     | '/staff/students'
+    | '/student/account'
     | '/student/assignments'
     | '/student/fees'
     | '/student/results'
@@ -279,6 +290,7 @@ export interface FileRouteTypes {
     | '/staff/notices'
     | '/staff/scores'
     | '/staff/students'
+    | '/student/account'
     | '/student/assignments'
     | '/student/fees'
     | '/student/results'
@@ -426,6 +438,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof StudentIndexRouteImport
       parentRoute: typeof StudentRoute
     }
+    '/student/account': {
+      id: '/student/account'
+      path: '/account'
+      fullPath: '/student/account'
+      preLoaderRoute: typeof StudentAccountRouteImport
+      parentRoute: typeof StudentRoute
+    }
     '/student/assignments': {
       id: '/student/assignments'
       path: '/assignments'
@@ -484,6 +503,7 @@ const StaffRouteChildren: StaffRouteChildren = {
 const StaffRouteWithChildren = StaffRoute._addFileChildren(StaffRouteChildren)
 
 interface StudentRouteChildren {
+  StudentAccountRoute: typeof StudentAccountRoute
   StudentAssignmentsRoute: typeof StudentAssignmentsRoute
   StudentFeesRoute: typeof StudentFeesRoute
   StudentResultsRoute: typeof StudentResultsRoute
@@ -492,6 +512,7 @@ interface StudentRouteChildren {
 }
 
 const StudentRouteChildren: StudentRouteChildren = {
+  StudentAccountRoute: StudentAccountRoute,
   StudentAssignmentsRoute: StudentAssignmentsRoute,
   StudentFeesRoute: StudentFeesRoute,
   StudentResultsRoute: StudentResultsRoute,
