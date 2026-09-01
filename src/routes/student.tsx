@@ -10,6 +10,7 @@ const NAV = [
   { to: "/student/assignments", label: "Assignments" },
   { to: "/student/results", label: "Results & Report Card" },
   { to: "/student/fees", label: "Fees" },
+  { to: "/student/account", label: "Account & Security" },
 ];
 
 export const Route = createFileRoute("/student")({
