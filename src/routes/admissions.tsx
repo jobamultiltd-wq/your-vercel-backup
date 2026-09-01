@@ -29,7 +29,7 @@ export const Route = createFileRoute("/admissions")({
   component: AdmissionsPage,
 });
 
-const CLASSES = [
+const FALLBACK_CLASSES = [
   "JSS 1",
   "JSS 2",
   "JSS 3",
@@ -37,6 +37,7 @@ const CLASSES = [
   "SSS 2",
   "SSS 3",
 ];
+
 
 function Field({
   name,
@@ -94,7 +95,8 @@ function AdmissionsPage() {
 }
 
 function AdmissionsPageForm() {
-
+  const academic = useSiteSettings().academic;
+  const classLevels = academic.classLevels.length ? academic.classLevels : FALLBACK_CLASSES;
   const [busy, setBusy] = useState(false);
   const [reference, setReference] = useState<string | null>(null);
   const [docs, setDocs] = useState<Record<string, string>>({});
@@ -169,7 +171,7 @@ function AdmissionsPageForm() {
         </Section>
 
         <Section title="Placement">
-          <Field name="class_applying_for" label="Class applying for" required options={CLASSES} />
+          <Field name="class_applying_for" label="Class applying for" required options={classLevels} />
           <Field
             name="schooling_option"
             label="Schooling option"
@@ -181,7 +183,11 @@ function AdmissionsPageForm() {
             label="Specialised track"
             options={["Music Conservatory", "ICT Track", "Vocational Trade", "None"]}
           />
-          <Field name="academic_session" label="Academic session" />
+          <div className="space-y-1.5">
+            <Label htmlFor="academic_session">Academic session</Label>
+            <Input id="academic_session" name="academic_session" value={academic.session} readOnly />
+          </div>
+
           <Field name="last_school_attended" label="Last school attended" />
           <Field name="last_class_passed" label="Last class passed" />
         </Section>
