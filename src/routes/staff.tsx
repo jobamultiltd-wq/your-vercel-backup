@@ -13,6 +13,7 @@ const NAV = [
   { to: "/staff/assignments", label: "Assignments" },
   { to: "/staff/notices", label: "Notices" },
   { to: "/staff/fees", label: "Fees" },
+  { to: "/staff/notifications", label: "Parent Alerts" },
   { to: "/staff/account", label: "Account & Security" },
 ];
 
