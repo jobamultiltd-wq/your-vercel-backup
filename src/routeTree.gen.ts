@@ -10,33 +10,280 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AdmissionsRouteImport } from './routes/admissions'
+import { Route as CareersRouteImport } from './routes/careers'
+import { Route as HolidayCoachingRouteImport } from './routes/holiday-coaching'
+import { Route as LoginRouteImport } from './routes/login'
+import { Route as StaffRouteImport } from './routes/staff'
+import { Route as StudentRouteImport } from './routes/student'
+import { Route as TrackRouteImport } from './routes/track'
+import { Route as StaffIndexRouteImport } from './routes/staff.index'
+import { Route as StaffAdmissionsRouteImport } from './routes/staff.admissions'
+import { Route as StaffAssignmentsRouteImport } from './routes/staff.assignments'
+import { Route as StaffAttendanceRouteImport } from './routes/staff.attendance'
+import { Route as StaffFeesRouteImport } from './routes/staff.fees'
+import { Route as StaffNoticesRouteImport } from './routes/staff.notices'
+import { Route as StaffScoresRouteImport } from './routes/staff.scores'
+import { Route as StaffStudentsRouteImport } from './routes/staff.students'
+import { Route as StudentIndexRouteImport } from './routes/student.index'
+import { Route as StudentAssignmentsRouteImport } from './routes/student.assignments'
+import { Route as StudentFeesRouteImport } from './routes/student.fees'
+import { Route as StudentResultsRouteImport } from './routes/student.results'
+import { Route as StudentSubjectsRouteImport } from './routes/student.subjects'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AdmissionsRoute = AdmissionsRouteImport.update({
+  id: '/admissions',
+  path: '/admissions',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CareersRoute = CareersRouteImport.update({
+  id: '/careers',
+  path: '/careers',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const HolidayCoachingRoute = HolidayCoachingRouteImport.update({
+  id: '/holiday-coaching',
+  path: '/holiday-coaching',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LoginRoute = LoginRouteImport.update({
+  id: '/login',
+  path: '/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const StaffRoute = StaffRouteImport.update({
+  id: '/staff',
+  path: '/staff',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const StudentRoute = StudentRouteImport.update({
+  id: '/student',
+  path: '/student',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TrackRoute = TrackRouteImport.update({
+  id: '/track',
+  path: '/track',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const StaffIndexRoute = StaffIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => StaffRoute,
+} as any)
+const StaffAdmissionsRoute = StaffAdmissionsRouteImport.update({
+  id: '/admissions',
+  path: '/admissions',
+  getParentRoute: () => StaffRoute,
+} as any)
+const StaffAssignmentsRoute = StaffAssignmentsRouteImport.update({
+  id: '/assignments',
+  path: '/assignments',
+  getParentRoute: () => StaffRoute,
+} as any)
+const StaffAttendanceRoute = StaffAttendanceRouteImport.update({
+  id: '/attendance',
+  path: '/attendance',
+  getParentRoute: () => StaffRoute,
+} as any)
+const StaffFeesRoute = StaffFeesRouteImport.update({
+  id: '/fees',
+  path: '/fees',
+  getParentRoute: () => StaffRoute,
+} as any)
+const StaffNoticesRoute = StaffNoticesRouteImport.update({
+  id: '/notices',
+  path: '/notices',
+  getParentRoute: () => StaffRoute,
+} as any)
+const StaffScoresRoute = StaffScoresRouteImport.update({
+  id: '/scores',
+  path: '/scores',
+  getParentRoute: () => StaffRoute,
+} as any)
+const StaffStudentsRoute = StaffStudentsRouteImport.update({
+  id: '/students',
+  path: '/students',
+  getParentRoute: () => StaffRoute,
+} as any)
+const StudentIndexRoute = StudentIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => StudentRoute,
+} as any)
+const StudentAssignmentsRoute = StudentAssignmentsRouteImport.update({
+  id: '/assignments',
+  path: '/assignments',
+  getParentRoute: () => StudentRoute,
+} as any)
+const StudentFeesRoute = StudentFeesRouteImport.update({
+  id: '/fees',
+  path: '/fees',
+  getParentRoute: () => StudentRoute,
+} as any)
+const StudentResultsRoute = StudentResultsRouteImport.update({
+  id: '/results',
+  path: '/results',
+  getParentRoute: () => StudentRoute,
+} as any)
+const StudentSubjectsRoute = StudentSubjectsRouteImport.update({
+  id: '/subjects',
+  path: '/subjects',
+  getParentRoute: () => StudentRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/admissions': typeof AdmissionsRoute
+  '/careers': typeof CareersRoute
+  '/holiday-coaching': typeof HolidayCoachingRoute
+  '/login': typeof LoginRoute
+  '/staff': typeof StaffRouteWithChildren
+  '/student': typeof StudentRouteWithChildren
+  '/track': typeof TrackRoute
+  '/staff/admissions': typeof StaffAdmissionsRoute
+  '/staff/assignments': typeof StaffAssignmentsRoute
+  '/staff/attendance': typeof StaffAttendanceRoute
+  '/staff/fees': typeof StaffFeesRoute
+  '/staff/notices': typeof StaffNoticesRoute
+  '/staff/scores': typeof StaffScoresRoute
+  '/staff/students': typeof StaffStudentsRoute
+  '/student/assignments': typeof StudentAssignmentsRoute
+  '/student/fees': typeof StudentFeesRoute
+  '/student/results': typeof StudentResultsRoute
+  '/student/subjects': typeof StudentSubjectsRoute
+  '/staff/': typeof StaffIndexRoute
+  '/student/': typeof StudentIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/admissions': typeof AdmissionsRoute
+  '/careers': typeof CareersRoute
+  '/holiday-coaching': typeof HolidayCoachingRoute
+  '/login': typeof LoginRoute
+  '/track': typeof TrackRoute
+  '/staff/admissions': typeof StaffAdmissionsRoute
+  '/staff/assignments': typeof StaffAssignmentsRoute
+  '/staff/attendance': typeof StaffAttendanceRoute
+  '/staff/fees': typeof StaffFeesRoute
+  '/staff/notices': typeof StaffNoticesRoute
+  '/staff/scores': typeof StaffScoresRoute
+  '/staff/students': typeof StaffStudentsRoute
+  '/student/assignments': typeof StudentAssignmentsRoute
+  '/student/fees': typeof StudentFeesRoute
+  '/student/results': typeof StudentResultsRoute
+  '/student/subjects': typeof StudentSubjectsRoute
+  '/staff': typeof StaffIndexRoute
+  '/student': typeof StudentIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/admissions': typeof AdmissionsRoute
+  '/careers': typeof CareersRoute
+  '/holiday-coaching': typeof HolidayCoachingRoute
+  '/login': typeof LoginRoute
+  '/staff': typeof StaffRouteWithChildren
+  '/student': typeof StudentRouteWithChildren
+  '/track': typeof TrackRoute
+  '/staff/admissions': typeof StaffAdmissionsRoute
+  '/staff/assignments': typeof StaffAssignmentsRoute
+  '/staff/attendance': typeof StaffAttendanceRoute
+  '/staff/fees': typeof StaffFeesRoute
+  '/staff/notices': typeof StaffNoticesRoute
+  '/staff/scores': typeof StaffScoresRoute
+  '/staff/students': typeof StaffStudentsRoute
+  '/student/assignments': typeof StudentAssignmentsRoute
+  '/student/fees': typeof StudentFeesRoute
+  '/student/results': typeof StudentResultsRoute
+  '/student/subjects': typeof StudentSubjectsRoute
+  '/staff/': typeof StaffIndexRoute
+  '/student/': typeof StudentIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths:
+    | '/'
+    | '/admissions'
+    | '/careers'
+    | '/holiday-coaching'
+    | '/login'
+    | '/staff'
+    | '/student'
+    | '/track'
+    | '/staff/admissions'
+    | '/staff/assignments'
+    | '/staff/attendance'
+    | '/staff/fees'
+    | '/staff/notices'
+    | '/staff/scores'
+    | '/staff/students'
+    | '/student/assignments'
+    | '/student/fees'
+    | '/student/results'
+    | '/student/subjects'
+    | '/staff/'
+    | '/student/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to:
+    | '/'
+    | '/admissions'
+    | '/careers'
+    | '/holiday-coaching'
+    | '/login'
+    | '/track'
+    | '/staff/admissions'
+    | '/staff/assignments'
+    | '/staff/attendance'
+    | '/staff/fees'
+    | '/staff/notices'
+    | '/staff/scores'
+    | '/staff/students'
+    | '/student/assignments'
+    | '/student/fees'
+    | '/student/results'
+    | '/student/subjects'
+    | '/staff'
+    | '/student'
+  id:
+    | '__root__'
+    | '/'
+    | '/admissions'
+    | '/careers'
+    | '/holiday-coaching'
+    | '/login'
+    | '/staff'
+    | '/student'
+    | '/track'
+    | '/staff/admissions'
+    | '/staff/assignments'
+    | '/staff/attendance'
+    | '/staff/fees'
+    | '/staff/notices'
+    | '/staff/scores'
+    | '/staff/students'
+    | '/student/assignments'
+    | '/student/fees'
+    | '/student/results'
+    | '/student/subjects'
+    | '/staff/'
+    | '/student/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AdmissionsRoute: typeof AdmissionsRoute
+  CareersRoute: typeof CareersRoute
+  HolidayCoachingRoute: typeof HolidayCoachingRoute
+  LoginRoute: typeof LoginRoute
+  StaffRoute: typeof StaffRouteWithChildren
+  StudentRoute: typeof StudentRouteWithChildren
+  TrackRoute: typeof TrackRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -48,11 +295,201 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/admissions': {
+      id: '/admissions'
+      path: '/admissions'
+      fullPath: '/admissions'
+      preLoaderRoute: typeof AdmissionsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/careers': {
+      id: '/careers'
+      path: '/careers'
+      fullPath: '/careers'
+      preLoaderRoute: typeof CareersRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/holiday-coaching': {
+      id: '/holiday-coaching'
+      path: '/holiday-coaching'
+      fullPath: '/holiday-coaching'
+      preLoaderRoute: typeof HolidayCoachingRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/login': {
+      id: '/login'
+      path: '/login'
+      fullPath: '/login'
+      preLoaderRoute: typeof LoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/staff': {
+      id: '/staff'
+      path: '/staff'
+      fullPath: '/staff'
+      preLoaderRoute: typeof StaffRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/student': {
+      id: '/student'
+      path: '/student'
+      fullPath: '/student'
+      preLoaderRoute: typeof StudentRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/track': {
+      id: '/track'
+      path: '/track'
+      fullPath: '/track'
+      preLoaderRoute: typeof TrackRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/staff/': {
+      id: '/staff/'
+      path: '/'
+      fullPath: '/staff/'
+      preLoaderRoute: typeof StaffIndexRouteImport
+      parentRoute: typeof StaffRoute
+    }
+    '/staff/admissions': {
+      id: '/staff/admissions'
+      path: '/admissions'
+      fullPath: '/staff/admissions'
+      preLoaderRoute: typeof StaffAdmissionsRouteImport
+      parentRoute: typeof StaffRoute
+    }
+    '/staff/assignments': {
+      id: '/staff/assignments'
+      path: '/assignments'
+      fullPath: '/staff/assignments'
+      preLoaderRoute: typeof StaffAssignmentsRouteImport
+      parentRoute: typeof StaffRoute
+    }
+    '/staff/attendance': {
+      id: '/staff/attendance'
+      path: '/attendance'
+      fullPath: '/staff/attendance'
+      preLoaderRoute: typeof StaffAttendanceRouteImport
+      parentRoute: typeof StaffRoute
+    }
+    '/staff/fees': {
+      id: '/staff/fees'
+      path: '/fees'
+      fullPath: '/staff/fees'
+      preLoaderRoute: typeof StaffFeesRouteImport
+      parentRoute: typeof StaffRoute
+    }
+    '/staff/notices': {
+      id: '/staff/notices'
+      path: '/notices'
+      fullPath: '/staff/notices'
+      preLoaderRoute: typeof StaffNoticesRouteImport
+      parentRoute: typeof StaffRoute
+    }
+    '/staff/scores': {
+      id: '/staff/scores'
+      path: '/scores'
+      fullPath: '/staff/scores'
+      preLoaderRoute: typeof StaffScoresRouteImport
+      parentRoute: typeof StaffRoute
+    }
+    '/staff/students': {
+      id: '/staff/students'
+      path: '/students'
+      fullPath: '/staff/students'
+      preLoaderRoute: typeof StaffStudentsRouteImport
+      parentRoute: typeof StaffRoute
+    }
+    '/student/': {
+      id: '/student/'
+      path: '/'
+      fullPath: '/student/'
+      preLoaderRoute: typeof StudentIndexRouteImport
+      parentRoute: typeof StudentRoute
+    }
+    '/student/assignments': {
+      id: '/student/assignments'
+      path: '/assignments'
+      fullPath: '/student/assignments'
+      preLoaderRoute: typeof StudentAssignmentsRouteImport
+      parentRoute: typeof StudentRoute
+    }
+    '/student/fees': {
+      id: '/student/fees'
+      path: '/fees'
+      fullPath: '/student/fees'
+      preLoaderRoute: typeof StudentFeesRouteImport
+      parentRoute: typeof StudentRoute
+    }
+    '/student/results': {
+      id: '/student/results'
+      path: '/results'
+      fullPath: '/student/results'
+      preLoaderRoute: typeof StudentResultsRouteImport
+      parentRoute: typeof StudentRoute
+    }
+    '/student/subjects': {
+      id: '/student/subjects'
+      path: '/subjects'
+      fullPath: '/student/subjects'
+      preLoaderRoute: typeof StudentSubjectsRouteImport
+      parentRoute: typeof StudentRoute
+    }
   }
 }
 
+interface StaffRouteChildren {
+  StaffAdmissionsRoute: typeof StaffAdmissionsRoute
+  StaffAssignmentsRoute: typeof StaffAssignmentsRoute
+  StaffAttendanceRoute: typeof StaffAttendanceRoute
+  StaffFeesRoute: typeof StaffFeesRoute
+  StaffNoticesRoute: typeof StaffNoticesRoute
+  StaffScoresRoute: typeof StaffScoresRoute
+  StaffStudentsRoute: typeof StaffStudentsRoute
+  StaffIndexRoute: typeof StaffIndexRoute
+}
+
+const StaffRouteChildren: StaffRouteChildren = {
+  StaffAdmissionsRoute: StaffAdmissionsRoute,
+  StaffAssignmentsRoute: StaffAssignmentsRoute,
+  StaffAttendanceRoute: StaffAttendanceRoute,
+  StaffFeesRoute: StaffFeesRoute,
+  StaffNoticesRoute: StaffNoticesRoute,
+  StaffScoresRoute: StaffScoresRoute,
+  StaffStudentsRoute: StaffStudentsRoute,
+  StaffIndexRoute: StaffIndexRoute,
+}
+
+const StaffRouteWithChildren = StaffRoute._addFileChildren(StaffRouteChildren)
+
+interface StudentRouteChildren {
+  StudentAssignmentsRoute: typeof StudentAssignmentsRoute
+  StudentFeesRoute: typeof StudentFeesRoute
+  StudentResultsRoute: typeof StudentResultsRoute
+  StudentSubjectsRoute: typeof StudentSubjectsRoute
+  StudentIndexRoute: typeof StudentIndexRoute
+}
+
+const StudentRouteChildren: StudentRouteChildren = {
+  StudentAssignmentsRoute: StudentAssignmentsRoute,
+  StudentFeesRoute: StudentFeesRoute,
+  StudentResultsRoute: StudentResultsRoute,
+  StudentSubjectsRoute: StudentSubjectsRoute,
+  StudentIndexRoute: StudentIndexRoute,
+}
+
+const StudentRouteWithChildren =
+  StudentRoute._addFileChildren(StudentRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AdmissionsRoute: AdmissionsRoute,
+  CareersRoute: CareersRoute,
+  HolidayCoachingRoute: HolidayCoachingRoute,
+  LoginRoute: LoginRoute,
+  StaffRoute: StaffRouteWithChildren,
+  StudentRoute: StudentRouteWithChildren,
+  TrackRoute: TrackRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
