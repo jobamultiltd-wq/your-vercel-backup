@@ -581,13 +581,30 @@ export const recordFee = createServerFn({ method: "POST" })
     }) => d,
   )
   .handler(async ({ data }) => {
-    const { getDb, requireStaff } = await import("./portal.server");
+    const { getDb, requireStaff, sendEmail, emailShell } = await import("./portal.server");
     await requireStaff();
-    const { error } = await getDb()
-      .from("fee_payments")
-      .insert({ ...data, reference: `PAY-${Date.now().toString(36).toUpperCase()}` });
+    const reference = `PAY-${Date.now().toString(36).toUpperCase()}`;
+    const { error } = await getDb().from("fee_payments").insert({ ...data, reference });
     if (error) return { ok: false as const, error: error.message };
-    return { ok: true as const };
+
+    if (data.status === "Paid" || data.status === "Part Payment") {
+      const target = await findGuardian(data.admission_id);
+      if (target) {
+        await sendEmail({
+          to: target.email,
+          subject: `Payment receipt ${reference} — ${target.studentName}`,
+          html: emailShell(
+            "Fee Payment Received",
+            `<p>Dear ${target.guardianName},</p>
+             <p>We have received <strong>₦${Number(data.amount).toLocaleString()}</strong>
+             (${data.payment_type}) for <strong>${target.studentName}</strong> (${target.classLevel}).</p>
+             <p>Reference: <strong>${reference}</strong><br/>Status: <strong>${data.status}</strong><br/>
+             Description: ${data.description}</p>`,
+          ),
+        });
+      }
+    }
+    return { ok: true as const, reference };
   });
 
 /* ------------------------------------------------------------------ */
