@@ -29,11 +29,21 @@ export type PortalToggles = {
   defaultStudentPassword: string;
 };
 
+/** Per-class result publication flags, keyed by "class|session|term". */
+export type ResultsSettings = {
+  published: Record<string, boolean>;
+};
+
 export type PortalSettings = {
   school: SchoolSettings;
   academic: AcademicSettings;
   portal: PortalToggles;
+  results: ResultsSettings;
 };
+
+export function resultsKey(classLevel: string, session: string, term: string) {
+  return `${classLevel}|${session}|${term}`;
+}
 
 export const DEFAULT_SETTINGS: PortalSettings = {
   school: {
@@ -69,6 +79,7 @@ export const DEFAULT_SETTINGS: PortalSettings = {
     announcement: "",
     defaultStudentPassword: "Joba@2026",
   },
+  results: { published: {} },
 };
 
 export const STAFF_ROLES = [
