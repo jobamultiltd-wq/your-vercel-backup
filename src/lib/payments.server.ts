@@ -139,3 +139,89 @@ export function receiptHtml(opts: {
     <p>Please keep this receipt for your records. It was generated automatically on payment
        confirmation and is valid without a signature.</p>`;
 }
+
+/**
+ * Confirm a Flutterwave transaction and turn it into a paid fee record plus an
+ * instant receipt e-mail. Idempotent: a reference that is already marked paid
+ * is returned unchanged, so the redirect and the webhook can both call it.
+ */
+export async function settleFeePayment(txRef: string) {
+  const { getDb, sendEmail, emailShell, adminEmail } = await import("./portal.server");
+  const db = getDb();
+
+  const { data: existing } = await db
+    .from("fee_payments")
+    .select("*")
+    .eq("reference", txRef)
+    .maybeSingle();
+  if (!existing) return { ok: false as const, error: "Unknown payment reference." };
+  if (String(existing["status"]) === "Paid") {
+    return { ok: true as const, alreadySettled: true, amount: Number(existing["amount"] ?? 0), reference: txRef };
+  }
+
+  const verified = await verifyFlutterwavePayment(txRef);
+  if (!verified.ok) return { ok: false as const, error: verified.error };
+  const payment = verified.payment;
+  if (payment.status !== "successful") {
+    await db.from("fee_payments").update({ status: "Failed" }).eq("reference", txRef);
+    return { ok: false as const, error: "The payment was not completed." };
+  }
+  if (payment.amount + 0.01 < Number(existing["amount"] ?? 0)) {
+    return { ok: false as const, error: "The amount paid does not match the invoice." };
+  }
+
+  const admissionId = String(existing["admission_id"]);
+  await db
+    .from("fee_payments")
+    .update({ status: "Paid", amount: payment.amount })
+    .eq("reference", txRef);
+
+  const [{ data: profile }, { data: rows }] = await Promise.all([
+    db
+      .from("student_profiles")
+      .select("first_name, last_name, class_level, guardian_email, guardian_name")
+      .eq("admission_id", admissionId)
+      .maybeSingle(),
+    db.from("fee_payments").select("amount, status").eq("admission_id", admissionId),
+  ]);
+
+  const outstanding = (rows ?? [])
+    .filter((r) => String(r["status"]) !== "Paid" && String(r["status"]) !== "Success")
+    .reduce((s, r) => s + Number(r["amount"] ?? 0), 0);
+
+  const studentName = `${profile?.["first_name"] ?? ""} ${profile?.["last_name"] ?? ""}`.trim() || admissionId;
+  const guardianEmail = String(profile?.["guardian_email"] ?? payment.customerEmail ?? "").trim();
+  const html = emailShell(
+    "Official Fee Payment Receipt",
+    receiptHtml({
+      guardianName: String(profile?.["guardian_name"] ?? "Parent/Guardian"),
+      studentName,
+      classLevel: String(profile?.["class_level"] ?? ""),
+      admissionId,
+      amount: payment.amount,
+      reference: txRef,
+      description: String(existing["description"] ?? "School fees"),
+      channel: payment.channel,
+      paidAt: new Date().toLocaleString("en-GB", { timeZone: "Africa/Lagos" }),
+      balance: outstanding,
+    }),
+  );
+
+  const recipients = [guardianEmail, adminEmail()].filter((e) => e.includes("@"));
+  if (recipients.length) {
+    await sendEmail({
+      to: recipients,
+      subject: `Fee receipt ${txRef} — ${studentName}`,
+      html,
+    });
+  }
+
+  return {
+    ok: true as const,
+    alreadySettled: false,
+    amount: payment.amount,
+    reference: txRef,
+    emailedTo: guardianEmail,
+    balance: outstanding,
+  };
+}
