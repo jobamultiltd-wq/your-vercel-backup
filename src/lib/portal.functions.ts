@@ -207,10 +207,10 @@ export const submitAssignment = createServerFn({ method: "POST" })
       admission_id: user.id!,
       assignment_id: data.assignmentId,
       status: "Submitted",
-      submission_text: data.text,
-      submission_url: data.fileUrl ?? null,
+      feedback: data.text ? `Student note: ${data.text}` : null,
       submitted_at: new Date().toISOString(),
     };
+
     const { error } = existing
       ? await db.from("student_assignments").update(payload).eq("id", existing["id"])
       : await db.from("student_assignments").insert(payload);
