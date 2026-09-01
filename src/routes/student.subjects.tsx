@@ -53,6 +53,12 @@ function SubjectsPage() {
         subtitle={`${section} catalogue for ${user?.classLevel ?? "your class"}.`}
       />
 
+      {!subjects.isLoading && list.length === 0 ? (
+        <p className="rounded-lg border border-border bg-card p-4 text-sm text-muted-foreground">
+          No subject catalogue has been published for {section} yet. Please check back later.
+        </p>
+      ) : null}
+
       <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
         {list.map((s) => {
           const name = String(s["name"]);
