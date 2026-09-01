@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { Link, createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { toast } from "sonner";
 
@@ -109,13 +109,24 @@ function AdmissionsPageForm() {
             <p className="mt-3 text-sm text-muted-foreground">Your reference number</p>
             <p className="font-display text-2xl font-bold text-accent">{reference}</p>
             <p className="mt-4 text-sm text-muted-foreground">
-              A confirmation email has been sent to the guardian email address provided.
+              A confirmation email has been sent to the guardian email address provided. Keep this
+              reference — you will need it to check your status and to activate your student portal
+              account once you are admitted.
             </p>
+            <div className="mt-6 flex flex-wrap gap-3">
+              <Button asChild>
+                <Link to="/track">Track my application</Link>
+              </Button>
+              <Button asChild variant="outline">
+                <Link to="/login">Student portal login</Link>
+              </Button>
+            </div>
           </div>
         </div>
       </PublicPage>
     );
   }
+
 
   return (
     <PublicPage>
