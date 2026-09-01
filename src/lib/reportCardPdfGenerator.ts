@@ -66,11 +66,11 @@ export function buildOfficialReportCardPDF(data: ReportCardData): jsPDF {
   doc.setFont('helvetica', 'bold');
   doc.setFontSize(34);
   doc.setTextColor(243, 246, 250); // very light blue-grey
-  doc.text('JOBA INTERNATIONAL ACADEMY', pageWidth / 2, pageHeight / 2 + 60, {
+  doc.text('JOBA INTERNATIONAL ACADEMY', pageWidth / 2, 110, {
     align: 'center',
     angle: -45,
   });
-  doc.text('JOBA INTERNATIONAL ACADEMY', pageWidth / 2, pageHeight / 2 - 60, {
+  doc.text('JOBA INTERNATIONAL ACADEMY', pageWidth / 2, 210, {
     align: 'center',
     angle: -45,
   });
