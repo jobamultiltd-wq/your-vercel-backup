@@ -58,11 +58,18 @@ export function SiteHeader() {
             </Link>
           ))}
           <Link
+            to="/parent"
+            className="rounded px-3 py-1.5 transition-colors hover:bg-primary-foreground/10"
+          >
+            Parent Access
+          </Link>
+          <Link
             to="/login"
             className="ml-1 rounded bg-accent px-3 py-1.5 font-semibold text-accent-foreground transition-opacity hover:opacity-90"
           >
             Portal Login
           </Link>
+
         </nav>
       </div>
     </header>

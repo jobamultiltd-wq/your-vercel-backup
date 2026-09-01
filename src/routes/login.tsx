@@ -1,4 +1,4 @@
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { Link, createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -102,9 +102,18 @@ function LoginPage() {
           ))}
         </Tabs>
 
-        <p className="mt-6 text-center text-xs text-muted-foreground">
+        <p className="mt-6 text-center text-sm">
+          Parent or guardian?{" "}
+          <Link to="/parent" className="font-semibold text-primary underline">
+            View your child&apos;s records
+          </Link>{" "}
+          — no account needed.
+        </p>
+
+        <p className="mt-3 text-center text-xs text-muted-foreground">
           Trouble signing in? Contact the Directorate at academy@jobamultiltd.com
         </p>
+
       </div>
     </div>
   );

@@ -14,9 +14,13 @@ import { Route as AdmissionsRouteImport } from './routes/admissions'
 import { Route as CareersRouteImport } from './routes/careers'
 import { Route as HolidayCoachingRouteImport } from './routes/holiday-coaching'
 import { Route as LoginRouteImport } from './routes/login'
+import { Route as ParentRouteImport } from './routes/parent'
 import { Route as StaffRouteImport } from './routes/staff'
 import { Route as StudentRouteImport } from './routes/student'
 import { Route as TrackRouteImport } from './routes/track'
+import { Route as ParentIndexRouteImport } from './routes/parent.index'
+import { Route as ParentDashboardRouteImport } from './routes/parent.dashboard'
+import { Route as ParentResultsRouteImport } from './routes/parent.results'
 import { Route as StaffIndexRouteImport } from './routes/staff.index'
 import { Route as StaffAccountRouteImport } from './routes/staff.account'
 import { Route as StaffAdminRouteImport } from './routes/staff.admin'
@@ -60,6 +64,11 @@ const LoginRoute = LoginRouteImport.update({
   path: '/login',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ParentRoute = ParentRouteImport.update({
+  id: '/parent',
+  path: '/parent',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const StaffRoute = StaffRouteImport.update({
   id: '/staff',
   path: '/staff',
@@ -74,6 +83,21 @@ const TrackRoute = TrackRouteImport.update({
   id: '/track',
   path: '/track',
   getParentRoute: () => rootRouteImport,
+} as any)
+const ParentIndexRoute = ParentIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => ParentRoute,
+} as any)
+const ParentDashboardRoute = ParentDashboardRouteImport.update({
+  id: '/dashboard',
+  path: '/dashboard',
+  getParentRoute: () => ParentRoute,
+} as any)
+const ParentResultsRoute = ParentResultsRouteImport.update({
+  id: '/results',
+  path: '/results',
+  getParentRoute: () => ParentRoute,
 } as any)
 const StaffIndexRoute = StaffIndexRouteImport.update({
   id: '/',
@@ -167,9 +191,12 @@ export interface FileRoutesByFullPath {
   '/careers': typeof CareersRoute
   '/holiday-coaching': typeof HolidayCoachingRoute
   '/login': typeof LoginRoute
+  '/parent': typeof ParentRouteWithChildren
   '/staff': typeof StaffRouteWithChildren
   '/student': typeof StudentRouteWithChildren
   '/track': typeof TrackRoute
+  '/parent/dashboard': typeof ParentDashboardRoute
+  '/parent/results': typeof ParentResultsRoute
   '/staff/account': typeof StaffAccountRoute
   '/staff/admin': typeof StaffAdminRoute
   '/staff/admissions': typeof StaffAdmissionsRoute
@@ -185,6 +212,7 @@ export interface FileRoutesByFullPath {
   '/student/fees': typeof StudentFeesRoute
   '/student/results': typeof StudentResultsRoute
   '/student/subjects': typeof StudentSubjectsRoute
+  '/parent/': typeof ParentIndexRoute
   '/staff/': typeof StaffIndexRoute
   '/student/': typeof StudentIndexRoute
 }
@@ -195,6 +223,8 @@ export interface FileRoutesByTo {
   '/holiday-coaching': typeof HolidayCoachingRoute
   '/login': typeof LoginRoute
   '/track': typeof TrackRoute
+  '/parent/dashboard': typeof ParentDashboardRoute
+  '/parent/results': typeof ParentResultsRoute
   '/staff/account': typeof StaffAccountRoute
   '/staff/admin': typeof StaffAdminRoute
   '/staff/admissions': typeof StaffAdmissionsRoute
@@ -210,6 +240,7 @@ export interface FileRoutesByTo {
   '/student/fees': typeof StudentFeesRoute
   '/student/results': typeof StudentResultsRoute
   '/student/subjects': typeof StudentSubjectsRoute
+  '/parent': typeof ParentIndexRoute
   '/staff': typeof StaffIndexRoute
   '/student': typeof StudentIndexRoute
 }
@@ -220,9 +251,12 @@ export interface FileRoutesById {
   '/careers': typeof CareersRoute
   '/holiday-coaching': typeof HolidayCoachingRoute
   '/login': typeof LoginRoute
+  '/parent': typeof ParentRouteWithChildren
   '/staff': typeof StaffRouteWithChildren
   '/student': typeof StudentRouteWithChildren
   '/track': typeof TrackRoute
+  '/parent/dashboard': typeof ParentDashboardRoute
+  '/parent/results': typeof ParentResultsRoute
   '/staff/account': typeof StaffAccountRoute
   '/staff/admin': typeof StaffAdminRoute
   '/staff/admissions': typeof StaffAdmissionsRoute
@@ -238,6 +272,7 @@ export interface FileRoutesById {
   '/student/fees': typeof StudentFeesRoute
   '/student/results': typeof StudentResultsRoute
   '/student/subjects': typeof StudentSubjectsRoute
+  '/parent/': typeof ParentIndexRoute
   '/staff/': typeof StaffIndexRoute
   '/student/': typeof StudentIndexRoute
 }
@@ -249,9 +284,12 @@ export interface FileRouteTypes {
     | '/careers'
     | '/holiday-coaching'
     | '/login'
+    | '/parent'
     | '/staff'
     | '/student'
     | '/track'
+    | '/parent/dashboard'
+    | '/parent/results'
     | '/staff/account'
     | '/staff/admin'
     | '/staff/admissions'
@@ -267,6 +305,7 @@ export interface FileRouteTypes {
     | '/student/fees'
     | '/student/results'
     | '/student/subjects'
+    | '/parent/'
     | '/staff/'
     | '/student/'
   fileRoutesByTo: FileRoutesByTo
@@ -277,6 +316,8 @@ export interface FileRouteTypes {
     | '/holiday-coaching'
     | '/login'
     | '/track'
+    | '/parent/dashboard'
+    | '/parent/results'
     | '/staff/account'
     | '/staff/admin'
     | '/staff/admissions'
@@ -292,6 +333,7 @@ export interface FileRouteTypes {
     | '/student/fees'
     | '/student/results'
     | '/student/subjects'
+    | '/parent'
     | '/staff'
     | '/student'
   id:
@@ -301,9 +343,12 @@ export interface FileRouteTypes {
     | '/careers'
     | '/holiday-coaching'
     | '/login'
+    | '/parent'
     | '/staff'
     | '/student'
     | '/track'
+    | '/parent/dashboard'
+    | '/parent/results'
     | '/staff/account'
     | '/staff/admin'
     | '/staff/admissions'
@@ -319,6 +364,7 @@ export interface FileRouteTypes {
     | '/student/fees'
     | '/student/results'
     | '/student/subjects'
+    | '/parent/'
     | '/staff/'
     | '/student/'
   fileRoutesById: FileRoutesById
@@ -329,6 +375,7 @@ export interface RootRouteChildren {
   CareersRoute: typeof CareersRoute
   HolidayCoachingRoute: typeof HolidayCoachingRoute
   LoginRoute: typeof LoginRoute
+  ParentRoute: typeof ParentRouteWithChildren
   StaffRoute: typeof StaffRouteWithChildren
   StudentRoute: typeof StudentRouteWithChildren
   TrackRoute: typeof TrackRoute
@@ -371,6 +418,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LoginRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/parent': {
+      id: '/parent'
+      path: '/parent'
+      fullPath: '/parent'
+      preLoaderRoute: typeof ParentRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/staff': {
       id: '/staff'
       path: '/staff'
@@ -391,6 +445,27 @@ declare module '@tanstack/react-router' {
       fullPath: '/track'
       preLoaderRoute: typeof TrackRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/parent/': {
+      id: '/parent/'
+      path: '/'
+      fullPath: '/parent/'
+      preLoaderRoute: typeof ParentIndexRouteImport
+      parentRoute: typeof ParentRoute
+    }
+    '/parent/dashboard': {
+      id: '/parent/dashboard'
+      path: '/dashboard'
+      fullPath: '/parent/dashboard'
+      preLoaderRoute: typeof ParentDashboardRouteImport
+      parentRoute: typeof ParentRoute
+    }
+    '/parent/results': {
+      id: '/parent/results'
+      path: '/results'
+      fullPath: '/parent/results'
+      preLoaderRoute: typeof ParentResultsRouteImport
+      parentRoute: typeof ParentRoute
     }
     '/staff/': {
       id: '/staff/'
@@ -514,6 +589,21 @@ declare module '@tanstack/react-router' {
   }
 }
 
+interface ParentRouteChildren {
+  ParentDashboardRoute: typeof ParentDashboardRoute
+  ParentResultsRoute: typeof ParentResultsRoute
+  ParentIndexRoute: typeof ParentIndexRoute
+}
+
+const ParentRouteChildren: ParentRouteChildren = {
+  ParentDashboardRoute: ParentDashboardRoute,
+  ParentResultsRoute: ParentResultsRoute,
+  ParentIndexRoute: ParentIndexRoute,
+}
+
+const ParentRouteWithChildren =
+  ParentRoute._addFileChildren(ParentRouteChildren)
+
 interface StaffRouteChildren {
   StaffAccountRoute: typeof StaffAccountRoute
   StaffAdminRoute: typeof StaffAdminRoute
@@ -571,6 +661,7 @@ const rootRouteChildren: RootRouteChildren = {
   CareersRoute: CareersRoute,
   HolidayCoachingRoute: HolidayCoachingRoute,
   LoginRoute: LoginRoute,
+  ParentRoute: ParentRouteWithChildren,
   StaffRoute: StaffRouteWithChildren,
   StudentRoute: StudentRouteWithChildren,
   TrackRoute: TrackRoute,
