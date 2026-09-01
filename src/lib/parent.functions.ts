@@ -138,9 +138,15 @@ export const parentOverview = createServerFn({ method: "GET" }).handler(async ()
     db.from("attendance_records").select("*").eq("admission_id", id),
     db.from("notices").select("*").order("created_at", { ascending: false }).limit(5),
     db.from("student_assignments").select("*").eq("admission_id", id),
+    db
+      .from("admissions")
+      .select("id, class_applying_for, payment_status, payment_reference, created_at")
+      .eq("id", id)
+      .maybeSingle(),
   ]);
   return {
     profile: profile.data,
+    admission: admission.data,
     scores: scores.data ?? [],
     fees: fees.data ?? [],
     attendance: attendance.data ?? [],
