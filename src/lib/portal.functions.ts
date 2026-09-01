@@ -259,19 +259,25 @@ export const studentResults = createServerFn({ method: "GET" }).handler(async ()
   const { getDb, requireStudent } = await import("./portal.server");
   const user = await requireStudent();
   const db = getDb();
-  const [scores, reports, profile, attendance] = await Promise.all([
+  const [scores, reports, profile, attendance, admission] = await Promise.all([
     db.from("exam_scores").select("*").eq("admission_id", user.id!).order("subject"),
     db.from("student_term_reports").select("*").eq("admission_id", user.id!),
     db.from("student_profiles").select("*").eq("admission_id", user.id!).maybeSingle(),
     db.from("attendance_records").select("*").eq("admission_id", user.id!),
+    db
+      .from("admissions")
+      .select("gender, age, date_of_birth")
+      .eq("id", user.id!)
+      .maybeSingle(),
   ]);
   return {
     scores: scores.data ?? [],
     reports: reports.data ?? [],
-    profile: profile.data,
+    profile: profile.data ? { ...profile.data, ...(admission.data ?? {}) } : admission.data,
     attendance: attendance.data ?? [],
   };
 });
+
 
 /* ------------------------------------------------------------------ */
 /* Staff portal                                                        */
