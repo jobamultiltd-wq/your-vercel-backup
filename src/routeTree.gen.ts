@@ -20,6 +20,7 @@ import { Route as StudentRouteImport } from './routes/student'
 import { Route as TrackRouteImport } from './routes/track'
 import { Route as ParentIndexRouteImport } from './routes/parent.index'
 import { Route as ParentDashboardRouteImport } from './routes/parent.dashboard'
+import { Route as ParentFeesRouteImport } from './routes/parent.fees'
 import { Route as ParentResultsRouteImport } from './routes/parent.results'
 import { Route as StaffIndexRouteImport } from './routes/staff.index'
 import { Route as StaffAccountRouteImport } from './routes/staff.account'
@@ -95,6 +96,11 @@ const ParentIndexRoute = ParentIndexRouteImport.update({
 const ParentDashboardRoute = ParentDashboardRouteImport.update({
   id: '/dashboard',
   path: '/dashboard',
+  getParentRoute: () => ParentRoute,
+} as any)
+const ParentFeesRoute = ParentFeesRouteImport.update({
+  id: '/fees',
+  path: '/fees',
   getParentRoute: () => ParentRoute,
 } as any)
 const ParentResultsRoute = ParentResultsRouteImport.update({
@@ -214,6 +220,7 @@ export interface FileRoutesByFullPath {
   '/student': typeof StudentRouteWithChildren
   '/track': typeof TrackRoute
   '/parent/dashboard': typeof ParentDashboardRoute
+  '/parent/fees': typeof ParentFeesRoute
   '/parent/results': typeof ParentResultsRoute
   '/staff/account': typeof StaffAccountRoute
   '/staff/admin': typeof StaffAdminRoute
@@ -245,6 +252,7 @@ export interface FileRoutesByTo {
   '/login': typeof LoginRoute
   '/track': typeof TrackRoute
   '/parent/dashboard': typeof ParentDashboardRoute
+  '/parent/fees': typeof ParentFeesRoute
   '/parent/results': typeof ParentResultsRoute
   '/staff/account': typeof StaffAccountRoute
   '/staff/admin': typeof StaffAdminRoute
@@ -280,6 +288,7 @@ export interface FileRoutesById {
   '/student': typeof StudentRouteWithChildren
   '/track': typeof TrackRoute
   '/parent/dashboard': typeof ParentDashboardRoute
+  '/parent/fees': typeof ParentFeesRoute
   '/parent/results': typeof ParentResultsRoute
   '/staff/account': typeof StaffAccountRoute
   '/staff/admin': typeof StaffAdminRoute
@@ -316,6 +325,7 @@ export interface FileRouteTypes {
     | '/student'
     | '/track'
     | '/parent/dashboard'
+    | '/parent/fees'
     | '/parent/results'
     | '/staff/account'
     | '/staff/admin'
@@ -347,6 +357,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/track'
     | '/parent/dashboard'
+    | '/parent/fees'
     | '/parent/results'
     | '/staff/account'
     | '/staff/admin'
@@ -381,6 +392,7 @@ export interface FileRouteTypes {
     | '/student'
     | '/track'
     | '/parent/dashboard'
+    | '/parent/fees'
     | '/parent/results'
     | '/staff/account'
     | '/staff/admin'
@@ -495,6 +507,13 @@ declare module '@tanstack/react-router' {
       path: '/dashboard'
       fullPath: '/parent/dashboard'
       preLoaderRoute: typeof ParentDashboardRouteImport
+      parentRoute: typeof ParentRoute
+    }
+    '/parent/fees': {
+      id: '/parent/fees'
+      path: '/fees'
+      fullPath: '/parent/fees'
+      preLoaderRoute: typeof ParentFeesRouteImport
       parentRoute: typeof ParentRoute
     }
     '/parent/results': {
@@ -649,12 +668,14 @@ declare module '@tanstack/react-router' {
 
 interface ParentRouteChildren {
   ParentDashboardRoute: typeof ParentDashboardRoute
+  ParentFeesRoute: typeof ParentFeesRoute
   ParentResultsRoute: typeof ParentResultsRoute
   ParentIndexRoute: typeof ParentIndexRoute
 }
 
 const ParentRouteChildren: ParentRouteChildren = {
   ParentDashboardRoute: ParentDashboardRoute,
+  ParentFeesRoute: ParentFeesRoute,
   ParentResultsRoute: ParentResultsRoute,
   ParentIndexRoute: ParentIndexRoute,
 }

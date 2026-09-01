@@ -8,7 +8,11 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { confirmFeePayment, feeAccount, startFeePayment } from "@/lib/payments.functions";
 
-type Search = { status?: string; tx_ref?: string; transaction_id?: string };
+type Search = {
+  status?: string | undefined;
+  tx_ref?: string | undefined;
+  transaction_id?: string | undefined;
+};
 
 export const Route = createFileRoute("/parent/fees")({
   validateSearch: (search: Record<string, unknown>): Search => ({
