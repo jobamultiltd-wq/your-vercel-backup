@@ -721,3 +721,114 @@ export const setStaffStatus = createServerFn({ method: "POST" })
     if (error) return { ok: false as const, error: error.message };
     return { ok: true as const };
   });
+
+/* ------------------------------------------------------------------ */
+/* Parent notifications (email via Resend)                             */
+/* ------------------------------------------------------------------ */
+
+type GuardianTarget = {
+  email: string;
+  guardianName: string;
+  studentName: string;
+  classLevel: string;
+};
+
+async function findGuardian(admissionId: string): Promise<GuardianTarget | null> {
+  const { getDb } = await import("./portal.server");
+  const db = getDb();
+  const { data: profile } = await db
+    .from("student_profiles")
+    .select("guardian_email, first_name, last_name, class_level")
+    .eq("admission_id", admissionId)
+    .maybeSingle();
+  const { data: adm } = await db
+    .from("admissions")
+    .select("guardian_email, guardian_name, first_name, surname, class_applying_for")
+    .eq("id", admissionId)
+    .maybeSingle();
+
+  const email = String(profile?.["guardian_email"] ?? adm?.["guardian_email"] ?? "").trim();
+  if (!email) return null;
+  return {
+    email,
+    guardianName: String(adm?.["guardian_name"] ?? "Parent/Guardian"),
+    studentName:
+      `${String(profile?.["first_name"] ?? adm?.["first_name"] ?? "")} ${String(
+        profile?.["last_name"] ?? adm?.["surname"] ?? "",
+      )}`.trim() || "your child",
+    classLevel: String(profile?.["class_level"] ?? adm?.["class_applying_for"] ?? "—"),
+  };
+}
+
+export const listGuardianContacts = createServerFn({ method: "GET" }).handler(async () => {
+  const { getDb, requireStaff } = await import("./portal.server");
+  await requireStaff();
+  const { data } = await getDb()
+    .from("student_profiles")
+    .select("admission_id, first_name, last_name, class_level, guardian_email")
+    .order("class_level", { ascending: true });
+  return data ?? [];
+});
+
+/** Attendance alert to a parent (present / late / absent). */
+export const notifyAttendance = createServerFn({ method: "POST" })
+  .inputValidator(
+    (d: { admission_id: string; status: "Present" | "Late" | "Absent"; date: string; note?: string }) => d,
+  )
+  .handler(async ({ data }) => {
+    const { requireStaff, sendEmail, emailShell } = await import("./portal.server");
+    await requireStaff();
+    const target = await findGuardian(data.admission_id);
+    if (!target) return { ok: false as const, error: "No guardian email on record for this student." };
+
+    const tone =
+      data.status === "Absent"
+        ? "was <strong>absent</strong> from school"
+        : data.status === "Late"
+          ? "arrived <strong>late</strong> to school"
+          : "was <strong>present</strong> in school";
+
+    const res = await sendEmail({
+      to: target.email,
+      subject: `Attendance alert — ${target.studentName} (${data.date})`,
+      html: emailShell(
+        "Daily Attendance Alert",
+        `<p>Dear ${target.guardianName},</p>
+         <p>This is to inform you that <strong>${target.studentName}</strong> (${target.classLevel}) ${tone}
+         on <strong>${data.date}</strong>.</p>
+         ${data.note ? `<p>Class teacher's note: ${data.note}</p>` : ""}
+         <p>Please contact the school office if you have any questions.</p>`,
+      ),
+    });
+    if (!res.sent) return { ok: false as const, error: "Email gateway rejected the message." };
+    return { ok: true as const, email: target.email };
+  });
+
+/** Outstanding fee reminder to a parent. */
+export const sendFeeReminder = createServerFn({ method: "POST" })
+  .inputValidator(
+    (d: { admission_id: string; amount: number; due_date?: string; note?: string }) => d,
+  )
+  .handler(async ({ data }) => {
+    const { requireStaff, sendEmail, emailShell } = await import("./portal.server");
+    await requireStaff();
+    const target = await findGuardian(data.admission_id);
+    if (!target) return { ok: false as const, error: "No guardian email on record for this student." };
+
+    const res = await sendEmail({
+      to: target.email,
+      subject: `School fee reminder — ${target.studentName}`,
+      html: emailShell(
+        "Outstanding School Fees",
+        `<p>Dear ${target.guardianName},</p>
+         <p>Our bursary records show an outstanding balance of
+         <strong>₦${Number(data.amount).toLocaleString()}</strong> on the account of
+         <strong>${target.studentName}</strong> (${target.classLevel}).</p>
+         ${data.due_date ? `<p>Kindly settle on or before <strong>${data.due_date}</strong>.</p>` : ""}
+         ${data.note ? `<p>${data.note}</p>` : ""}
+         <p>Please disregard this notice if payment has already been made.</p>`,
+      ),
+    });
+    if (!res.sent) return { ok: false as const, error: "Email gateway rejected the message." };
+    return { ok: true as const, email: target.email };
+  });
