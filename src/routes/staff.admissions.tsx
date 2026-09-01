@@ -165,7 +165,9 @@ function AdmissionsAdmin() {
                     onClick={async () => {
                       setBusy(id);
                       const res = await enrollStudent({
-                        data: { admissionId: id, classLevel: selectedClass || undefined },
+                        data: selectedClass
+                          ? { admissionId: id, classLevel: selectedClass }
+                          : { admissionId: id },
                       });
                       setBusy(null);
                       if (res.ok) {
