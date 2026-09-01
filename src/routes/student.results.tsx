@@ -67,6 +67,7 @@ function ResultsPage() {
         position: s["subject_position"] ? String(s["subject_position"]) : undefined,
         highest: s["subject_highest"] != null ? Number(s["subject_highest"]) : undefined,
         lowest: s["subject_lowest"] != null ? Number(s["subject_lowest"]) : undefined,
+        average: s["subject_average"] != null ? Number(s["subject_average"]) : undefined,
         remark: s["teacher_remarks"] ? String(s["teacher_remarks"]) : undefined,
       })),
       affectiveSkills: (report["affective_skills"] as Record<string, number>) ?? {},
