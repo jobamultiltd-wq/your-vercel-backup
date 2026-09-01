@@ -209,20 +209,27 @@ export const studentOverview = createServerFn({ method: "GET" }).handler(async (
   const { getDb, requireStudent } = await import("./portal.server");
   const user = await requireStudent();
   const db = getDb();
-  const [profile, assignments, scores, fees, notices, registration] = await Promise.all([
-    db.from("student_profiles").select("*").eq("admission_id", user.id!).maybeSingle(),
-    db.from("student_assignments").select("*").eq("admission_id", user.id!),
-    db.from("exam_scores").select("*").eq("admission_id", user.id!),
-    db.from("fee_payments").select("*").eq("admission_id", user.id!),
-    db.from("notices").select("*").order("created_at", { ascending: false }).limit(5),
-    db
-      .from("student_subject_registrations")
-      .select("*")
-      .eq("admission_id", user.id!)
-      .maybeSingle(),
-  ]);
+  const [profile, assignments, scores, fees, notices, registration, admission] =
+    await Promise.all([
+      db.from("student_profiles").select("*").eq("admission_id", user.id!).maybeSingle(),
+      db.from("student_assignments").select("*").eq("admission_id", user.id!),
+      db.from("exam_scores").select("*").eq("admission_id", user.id!),
+      db.from("fee_payments").select("*").eq("admission_id", user.id!),
+      db.from("notices").select("*").order("created_at", { ascending: false }).limit(5),
+      db
+        .from("student_subject_registrations")
+        .select("*")
+        .eq("admission_id", user.id!)
+        .maybeSingle(),
+      db
+        .from("admissions")
+        .select("id, class_applying_for, payment_status, payment_reference, created_at")
+        .eq("id", user.id!)
+        .maybeSingle(),
+    ]);
   return {
     profile: profile.data,
+    admission: admission.data,
     assignments: assignments.data ?? [],
     scores: scores.data ?? [],
     fees: fees.data ?? [],
