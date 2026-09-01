@@ -64,6 +64,25 @@ export async function requireAdmin(): Promise<PortalSession> {
   return { ...user, id: String(data["id"]) };
 }
 
+/**
+ * Staff guard that re-checks the live staff_users row, so role changes and
+ * deactivations made in the admin console take effect immediately.
+ */
+export async function requirePermission(capability: Capability): Promise<PortalSession> {
+  const user = await requireStaff();
+  const db = getDb();
+  const { data } = await db
+    .from("staff_users")
+    .select("id, role, status")
+    .eq("staff_id", user.id!)
+    .maybeSingle();
+  if (!data) throw new Error("FORBIDDEN");
+  if (String(data["status"] ?? "").toLowerCase() !== "active") throw new Error("FORBIDDEN");
+  const dbRole = String(data["role"] ?? "");
+  if (!can(dbRole, capability)) throw new Error("FORBIDDEN");
+  return { ...user, staffRole: dbRole };
+}
+
 const PBKDF2_ITERATIONS = 100_000;
 
 function toHex(bytes: Uint8Array) {
