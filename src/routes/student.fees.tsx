@@ -32,7 +32,7 @@ function FeesPage() {
 
   return (
     <div className="space-y-6">
-      <h1 className="font-display text-3xl font-bold">Fees</h1>
+      <h1 className="font-display text-2xl font-bold sm:text-3xl">Fees</h1>
       <div className="grid gap-4 sm:grid-cols-2">
         <div className="rounded-lg border border-border bg-card p-5">
           <p className="text-sm text-muted-foreground">Total paid</p>
@@ -45,7 +45,7 @@ function FeesPage() {
       </div>
 
       <div className="overflow-x-auto rounded-lg border border-border">
-        <table className="w-full text-sm">
+        <table className="w-full min-w-[30rem] text-sm">
           <thead className="bg-secondary text-left">
             <tr>
               {["Reference", "Description", "Type", "Amount", "Status"].map((h) => (
