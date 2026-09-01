@@ -116,11 +116,11 @@ export function buildOfficialReportCardPDF(data: ReportCardData): jsPDF {
   doc.setFont('helvetica', 'bold');
   doc.setFontSize(12);
   doc.setTextColor(11, 25, 44);
-  doc.text(data.classPosition || '1st', badgeX + 9, badgeY + 11, { align: 'center' });
+  doc.text(data.classPosition || '—', badgeX + 9, badgeY + 11, { align: 'center' });
 
   doc.setFontSize(6);
   doc.setTextColor(180, 100, 0);
-  doc.text(`OF ${data.studentsInClass || 35}`, badgeX + 9, badgeY + 15.5, { align: 'center' });
+  doc.text(data.studentsInClass > 0 ? `OF ${data.studentsInClass}` : '—', badgeX + 9, badgeY + 15.5, { align: 'center' });
 
   // 3. Horizontal Separator
   let currentY = margin + 25;
@@ -330,10 +330,10 @@ export function buildOfficialReportCardPDF(data: ReportCardData): jsPDF {
     doc.text(sub.grade || 'A', cellX + 5, rowY + 4.8, { align: 'center' }); cellX += colW.grade;
 
     doc.setFont('helvetica', 'normal');
-    doc.text(sub.position || '1st', cellX + 5.5, rowY + 4.8, { align: 'center' }); cellX += colW.pos;
-    doc.text(String(sub.highest || 95), cellX + 5.5, rowY + 4.8, { align: 'center' }); cellX += colW.high;
-    doc.text(String(sub.lowest || 40), cellX + 5.5, rowY + 4.8, { align: 'center' }); cellX += colW.low;
-    doc.text(String(sub.average || 70), cellX + 6.5, rowY + 4.8, { align: 'center' });
+    doc.text(sub.position ?? '—', cellX + 5.5, rowY + 4.8, { align: 'center' }); cellX += colW.pos;
+    doc.text(sub.highest != null ? String(sub.highest) : '—', cellX + 5.5, rowY + 4.8, { align: 'center' }); cellX += colW.high;
+    doc.text(sub.lowest != null ? String(sub.lowest) : '—', cellX + 5.5, rowY + 4.8, { align: 'center' }); cellX += colW.low;
+    doc.text(sub.average != null ? String(sub.average) : '—', cellX + 6.5, rowY + 4.8, { align: 'center' });
 
     rowY += rowHeight;
   });
@@ -480,7 +480,7 @@ export function buildOfficialReportCardPDF(data: ReportCardData): jsPDF {
   doc.text('SCHOOL HEAD REMARKS:', margin + 4, currentY + 11.5);
   doc.setFont('helvetica', 'normal');
   doc.setTextColor(30, 41, 59);
-  doc.text(data.principalRemarks || 'Outstanding academic and moral performance. Congratulations on achieving 1st Position!', margin + 38, currentY + 11.5);
+  doc.text(data.principalRemarks || '—', margin + 38, currentY + 11.5);
 
   // Info to parents
   doc.setFont('helvetica', 'bold');
@@ -505,7 +505,7 @@ export function buildOfficialReportCardPDF(data: ReportCardData): jsPDF {
   doc.setDrawColor(11, 25, 44);
   doc.setLineWidth(0.4);
   doc.circle(stampBoxX + stampWidth / 2, currentY + 14.5, 6.5);
-  doc.setFontSize(4.8);
+  doc.setFontSize(3.6);
   doc.setTextColor(11, 25, 44);
   doc.text('JOBA ACADEMY', stampBoxX + stampWidth / 2, currentY + 13.5, { align: 'center' });
   doc.text('OFFICIAL SEAL', stampBoxX + stampWidth / 2, currentY + 16, { align: 'center' });
