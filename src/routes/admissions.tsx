@@ -90,6 +90,10 @@ function AdmissionsPage() {
       </PublicPage>
     );
   }
+  return <AdmissionsPageForm />;
+}
+
+function AdmissionsPageForm() {
 
   const [busy, setBusy] = useState(false);
   const [reference, setReference] = useState<string | null>(null);

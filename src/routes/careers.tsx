@@ -51,6 +51,10 @@ function CareersPage() {
       </PublicPage>
     );
   }
+  return <CareersPageForm />;
+}
+
+function CareersPageForm() {
 
   const [busy, setBusy] = useState(false);
   const [cvUrl, setCvUrl] = useState<string | null>(null);

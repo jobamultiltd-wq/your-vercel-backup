@@ -40,6 +40,10 @@ function HolidayPage() {
       </PublicPage>
     );
   }
+  return <HolidayPageForm />;
+}
+
+function HolidayPageForm() {
 
   const [busy, setBusy] = useState(false);
   const [done, setDone] = useState<string | null>(null);
