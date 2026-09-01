@@ -85,6 +85,74 @@ export async function requirePermission(capability: Capability): Promise<PortalS
   return { ...user, staffRole: dbRole };
 }
 
+/* ------------------------------------------------------------------ */
+/* Parent (guardian) access — no school account required               */
+/* ------------------------------------------------------------------ */
+
+export type ParentSession = {
+  admissionId?: string;
+  guardianEmail?: string;
+  guardianName?: string;
+  studentName?: string;
+  classLevel?: string;
+};
+
+export function getParentSession() {
+  const password = process.env["PORTAL_SESSION_SECRET"];
+  if (!password) throw new Error("Session secret is not configured");
+  return useSession<ParentSession>({
+    password,
+    name: "joba-parent",
+    maxAge: 60 * 60 * 6,
+    cookie: { httpOnly: true, secure: true, sameSite: "lax", path: "/" },
+  });
+}
+
+export async function currentParent(): Promise<ParentSession | null> {
+  const session = await getParentSession();
+  return session.data?.admissionId ? session.data : null;
+}
+
+export async function requireParent(): Promise<ParentSession> {
+  const parent = await currentParent();
+  if (!parent) throw new Error("UNAUTHORIZED");
+  return parent;
+}
+
+/** 10-minute rotating window used to derive stateless one-time access codes. */
+const PARENT_CODE_WINDOW_MS = 10 * 60 * 1000;
+
+async function parentCodeFor(admissionId: string, email: string, windowIndex: number) {
+  const secret = process.env["PORTAL_SESSION_SECRET"] ?? "";
+  const digest = await sha256Hex(
+    `parent:${secret}:${admissionId.trim().toLowerCase()}:${email.trim().toLowerCase()}:${windowIndex}`,
+  );
+  const num = parseInt(digest.slice(0, 8), 16) % 1_000_000;
+  return num.toString().padStart(6, "0");
+}
+
+/** Generate the code for the current window (emailed to the guardian). */
+export function currentCodeWindow() {
+  return Math.floor(Date.now() / PARENT_CODE_WINDOW_MS);
+}
+
+export async function issueParentCode(admissionId: string, email: string) {
+  return parentCodeFor(admissionId, email, currentCodeWindow());
+}
+
+/** Accept the current or previous window so a code stays valid ~10–20 minutes. */
+export async function verifyParentCode(admissionId: string, email: string, code: string) {
+  const supplied = code.replace(/\D/g, "");
+  if (supplied.length !== 6) return false;
+  const now = currentCodeWindow();
+  for (const w of [now, now - 1]) {
+    if (supplied === (await parentCodeFor(admissionId, email, w))) return true;
+  }
+  return false;
+}
+
+
+
 const PBKDF2_ITERATIONS = 100_000;
 
 function toHex(bytes: Uint8Array) {
