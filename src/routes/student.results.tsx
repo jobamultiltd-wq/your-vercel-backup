@@ -26,9 +26,10 @@ function ResultsPage() {
   if (isLoading || !data) return <p className="text-muted-foreground">Loading results…</p>;
 
   const scores = data.scores;
-  const total = scores.reduce((s, r) => s + Number(r["total"] ?? 0), 0);
+  const report = (data.reports[0] ?? {}) as Record<string, unknown>;
+  const att = (data.attendance[0] ?? {}) as Record<string, unknown>;
+  const total = scores.reduce((s, r) => s + Number(r["total_score"] ?? 0), 0);
   const average = scores.length ? total / scores.length : 0;
-  const present = data.attendance.filter((a) => a["status"] === "Present").length;
 
   function download() {
     if (!data) return;
@@ -40,36 +41,43 @@ function ResultsPage() {
       age: String(p["age"] ?? ""),
       classLevel: String(p["class_level"] ?? ""),
       specializedTrack: String(p["specialized_track"] ?? ""),
-      term: String(scores[0]?.["term"] ?? "First Term"),
-      session: String(scores[0]?.["session"] ?? ""),
-      resumptionDate: "",
-      studentsInClass: 0,
+      term: String(report["term"] ?? scores[0]?.["term"] ?? "First Term"),
+      session: String(report["session"] ?? scores[0]?.["session"] ?? ""),
+      resumptionDate: String(report["next_term_resumption"] ?? ""),
+      studentsInClass: Number(report["total_students"] ?? 0),
       classTeacherName: "",
-      totalDaysInTerm: data.attendance.length,
-      daysPresent: present,
-      daysAbsent: data.attendance.length - present,
-      classPosition: "",
-      totalScore: total,
-      totalObtainable: scores.length * 100,
-      averageScore: Number(average.toFixed(1)),
-      overallGrade:
-        average >= 75 ? "A" : average >= 65 ? "B" : average >= 55 ? "C" : average >= 45 ? "D" : "E",
+      totalDaysInTerm: Number(report["total_days_in_term"] ?? att["total_days"] ?? 0),
+      daysPresent: Number(report["days_present"] ?? att["days_present"] ?? 0),
+      daysAbsent: Number(report["days_absent"] ?? att["days_absent"] ?? 0),
+      classPosition: String(report["class_position"] ?? ""),
+      totalScore: Number(report["total_score"] ?? total),
+      totalObtainable: Number(report["total_obtainable"] ?? scores.length * 100),
+      averageScore: Number(report["average_score"] ?? average.toFixed(1)),
+      overallGrade: String(
+        report["overall_grade"] ??
+          (average >= 75 ? "A" : average >= 65 ? "B" : average >= 55 ? "C" : average >= 45 ? "D" : "E"),
+      ),
       subjects: scores.map((s) => ({
         subject: String(s["subject"]),
-        ca1: Number(s["ca1"] ?? 0),
-        ca2: Number(s["ca2"] ?? 0),
-        exam: Number(s["exam"] ?? 0),
-        total: Number(s["total"] ?? 0),
+        ca1: Number(s["ca1_score"] ?? 0),
+        ca2: Number(s["ca2_score"] ?? 0),
+        exam: Number(s["exam_score"] ?? 0),
+        total: Number(s["total_score"] ?? 0),
         grade: String(s["grade"] ?? ""),
+        position: s["subject_position"] ? String(s["subject_position"]) : undefined,
+        highest: s["subject_highest"] != null ? Number(s["subject_highest"]) : undefined,
+        lowest: s["subject_lowest"] != null ? Number(s["subject_lowest"]) : undefined,
+        remark: s["teacher_remarks"] ? String(s["teacher_remarks"]) : undefined,
       })),
-      affectiveSkills: {},
-      psychomotorSkills: {},
-      classTeacherRemarks: "",
-      principalRemarks: "",
-      infoToParents: "",
+      affectiveSkills: (report["affective_skills"] as Record<string, number>) ?? {},
+      psychomotorSkills: (report["psychomotor_skills"] as Record<string, number>) ?? {},
+      classTeacherRemarks: String(report["class_teacher_remarks"] ?? ""),
+      principalRemarks: String(report["principal_remarks"] ?? ""),
+      infoToParents: String(report["info_to_parents"] ?? ""),
     });
     doc.save(`report-card-${String(p["admission_id"] ?? "student")}.pdf`);
   }
+
 
   return (
     <div className="space-y-6">
