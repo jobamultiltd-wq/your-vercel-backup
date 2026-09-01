@@ -189,6 +189,12 @@ function subjectsFor(classLevel: string, track: string) {
   return track === "Arts" ? SSS_ARTS : SSS_SCIENCE;
 }
 
+function ordinal(n: number) {
+  const s = ["th", "st", "nd", "rd"];
+  const v = n % 100;
+  return `${n}${s[(v - 20) % 10] ?? s[v] ?? s[0]}`;
+}
+
 function gradeOf(total: number) {
   return total >= 75 ? "A" : total >= 65 ? "B" : total >= 55 ? "C" : total >= 45 ? "D" : total >= 40 ? "E" : "F";
 }
@@ -355,7 +361,7 @@ async function seedScoresAndReports(roster: Roster[]) {
         exam_score: exam,
         total_score: total,
         grade: gradeOf(total),
-        subject_position: `${1 + Math.round(rand() * 12)}${["st", "nd", "rd", "th"][Math.min(3, Math.round(rand() * 3))]}`,
+        subject_position: ordinal(1 + Math.round(rand() * 12)),
         subject_highest: highest,
         subject_lowest: lowest,
         subject_average: Math.round((highest + lowest) / 2),
