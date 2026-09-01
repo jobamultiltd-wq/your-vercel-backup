@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 
 import { Button } from "@/components/ui/button";
-import { studentResults } from "@/lib/portal.functions";
+import { getPortalSettings, studentResults } from "@/lib/portal.functions";
 import { buildOfficialReportCardPDF } from "@/lib/reportCardPdfGenerator";
 
 export const Route = createFileRoute("/student/results")({
