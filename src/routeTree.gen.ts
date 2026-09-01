@@ -20,6 +20,7 @@ import { Route as StudentRouteImport } from './routes/student'
 import { Route as TrackRouteImport } from './routes/track'
 import { Route as ParentIndexRouteImport } from './routes/parent.index'
 import { Route as ParentDashboardRouteImport } from './routes/parent.dashboard'
+import { Route as ParentResultsRouteImport } from './routes/parent.results'
 import { Route as StaffIndexRouteImport } from './routes/staff.index'
 import { Route as StaffAccountRouteImport } from './routes/staff.account'
 import { Route as StaffAdminRouteImport } from './routes/staff.admin'
@@ -91,6 +92,11 @@ const ParentIndexRoute = ParentIndexRouteImport.update({
 const ParentDashboardRoute = ParentDashboardRouteImport.update({
   id: '/dashboard',
   path: '/dashboard',
+  getParentRoute: () => ParentRoute,
+} as any)
+const ParentResultsRoute = ParentResultsRouteImport.update({
+  id: '/results',
+  path: '/results',
   getParentRoute: () => ParentRoute,
 } as any)
 const StaffIndexRoute = StaffIndexRouteImport.update({
@@ -190,6 +196,7 @@ export interface FileRoutesByFullPath {
   '/student': typeof StudentRouteWithChildren
   '/track': typeof TrackRoute
   '/parent/dashboard': typeof ParentDashboardRoute
+  '/parent/results': typeof ParentResultsRoute
   '/staff/account': typeof StaffAccountRoute
   '/staff/admin': typeof StaffAdminRoute
   '/staff/admissions': typeof StaffAdmissionsRoute
@@ -217,6 +224,7 @@ export interface FileRoutesByTo {
   '/login': typeof LoginRoute
   '/track': typeof TrackRoute
   '/parent/dashboard': typeof ParentDashboardRoute
+  '/parent/results': typeof ParentResultsRoute
   '/staff/account': typeof StaffAccountRoute
   '/staff/admin': typeof StaffAdminRoute
   '/staff/admissions': typeof StaffAdmissionsRoute
@@ -248,6 +256,7 @@ export interface FileRoutesById {
   '/student': typeof StudentRouteWithChildren
   '/track': typeof TrackRoute
   '/parent/dashboard': typeof ParentDashboardRoute
+  '/parent/results': typeof ParentResultsRoute
   '/staff/account': typeof StaffAccountRoute
   '/staff/admin': typeof StaffAdminRoute
   '/staff/admissions': typeof StaffAdmissionsRoute
@@ -280,6 +289,7 @@ export interface FileRouteTypes {
     | '/student'
     | '/track'
     | '/parent/dashboard'
+    | '/parent/results'
     | '/staff/account'
     | '/staff/admin'
     | '/staff/admissions'
@@ -307,6 +317,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/track'
     | '/parent/dashboard'
+    | '/parent/results'
     | '/staff/account'
     | '/staff/admin'
     | '/staff/admissions'
@@ -337,6 +348,7 @@ export interface FileRouteTypes {
     | '/student'
     | '/track'
     | '/parent/dashboard'
+    | '/parent/results'
     | '/staff/account'
     | '/staff/admin'
     | '/staff/admissions'
@@ -446,6 +458,13 @@ declare module '@tanstack/react-router' {
       path: '/dashboard'
       fullPath: '/parent/dashboard'
       preLoaderRoute: typeof ParentDashboardRouteImport
+      parentRoute: typeof ParentRoute
+    }
+    '/parent/results': {
+      id: '/parent/results'
+      path: '/results'
+      fullPath: '/parent/results'
+      preLoaderRoute: typeof ParentResultsRouteImport
       parentRoute: typeof ParentRoute
     }
     '/staff/': {
@@ -572,11 +591,13 @@ declare module '@tanstack/react-router' {
 
 interface ParentRouteChildren {
   ParentDashboardRoute: typeof ParentDashboardRoute
+  ParentResultsRoute: typeof ParentResultsRoute
   ParentIndexRoute: typeof ParentIndexRoute
 }
 
 const ParentRouteChildren: ParentRouteChildren = {
   ParentDashboardRoute: ParentDashboardRoute,
+  ParentResultsRoute: ParentResultsRoute,
   ParentIndexRoute: ParentIndexRoute,
 }
 
