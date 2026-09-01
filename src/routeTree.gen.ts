@@ -20,6 +20,7 @@ import { Route as StudentRouteImport } from './routes/student'
 import { Route as TrackRouteImport } from './routes/track'
 import { Route as ParentIndexRouteImport } from './routes/parent.index'
 import { Route as ParentDashboardRouteImport } from './routes/parent.dashboard'
+import { Route as ParentFeesRouteImport } from './routes/parent.fees'
 import { Route as ParentResultsRouteImport } from './routes/parent.results'
 import { Route as StaffIndexRouteImport } from './routes/staff.index'
 import { Route as StaffAccountRouteImport } from './routes/staff.account'
@@ -40,6 +41,7 @@ import { Route as StudentAssignmentsRouteImport } from './routes/student.assignm
 import { Route as StudentFeesRouteImport } from './routes/student.fees'
 import { Route as StudentResultsRouteImport } from './routes/student.results'
 import { Route as StudentSubjectsRouteImport } from './routes/student.subjects'
+import { Route as ApiPublicFlutterwaveRouteImport } from './routes/api/public/flutterwave'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -94,6 +96,11 @@ const ParentIndexRoute = ParentIndexRouteImport.update({
 const ParentDashboardRoute = ParentDashboardRouteImport.update({
   id: '/dashboard',
   path: '/dashboard',
+  getParentRoute: () => ParentRoute,
+} as any)
+const ParentFeesRoute = ParentFeesRouteImport.update({
+  id: '/fees',
+  path: '/fees',
   getParentRoute: () => ParentRoute,
 } as any)
 const ParentResultsRoute = ParentResultsRouteImport.update({
@@ -196,6 +203,11 @@ const StudentSubjectsRoute = StudentSubjectsRouteImport.update({
   path: '/subjects',
   getParentRoute: () => StudentRoute,
 } as any)
+const ApiPublicFlutterwaveRoute = ApiPublicFlutterwaveRouteImport.update({
+  id: '/api/public/flutterwave',
+  path: '/api/public/flutterwave',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -208,6 +220,7 @@ export interface FileRoutesByFullPath {
   '/student': typeof StudentRouteWithChildren
   '/track': typeof TrackRoute
   '/parent/dashboard': typeof ParentDashboardRoute
+  '/parent/fees': typeof ParentFeesRoute
   '/parent/results': typeof ParentResultsRoute
   '/staff/account': typeof StaffAccountRoute
   '/staff/admin': typeof StaffAdminRoute
@@ -229,6 +242,7 @@ export interface FileRoutesByFullPath {
   '/parent/': typeof ParentIndexRoute
   '/staff/': typeof StaffIndexRoute
   '/student/': typeof StudentIndexRoute
+  '/api/public/flutterwave': typeof ApiPublicFlutterwaveRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -238,6 +252,7 @@ export interface FileRoutesByTo {
   '/login': typeof LoginRoute
   '/track': typeof TrackRoute
   '/parent/dashboard': typeof ParentDashboardRoute
+  '/parent/fees': typeof ParentFeesRoute
   '/parent/results': typeof ParentResultsRoute
   '/staff/account': typeof StaffAccountRoute
   '/staff/admin': typeof StaffAdminRoute
@@ -259,6 +274,7 @@ export interface FileRoutesByTo {
   '/parent': typeof ParentIndexRoute
   '/staff': typeof StaffIndexRoute
   '/student': typeof StudentIndexRoute
+  '/api/public/flutterwave': typeof ApiPublicFlutterwaveRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -272,6 +288,7 @@ export interface FileRoutesById {
   '/student': typeof StudentRouteWithChildren
   '/track': typeof TrackRoute
   '/parent/dashboard': typeof ParentDashboardRoute
+  '/parent/fees': typeof ParentFeesRoute
   '/parent/results': typeof ParentResultsRoute
   '/staff/account': typeof StaffAccountRoute
   '/staff/admin': typeof StaffAdminRoute
@@ -293,6 +310,7 @@ export interface FileRoutesById {
   '/parent/': typeof ParentIndexRoute
   '/staff/': typeof StaffIndexRoute
   '/student/': typeof StudentIndexRoute
+  '/api/public/flutterwave': typeof ApiPublicFlutterwaveRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -307,6 +325,7 @@ export interface FileRouteTypes {
     | '/student'
     | '/track'
     | '/parent/dashboard'
+    | '/parent/fees'
     | '/parent/results'
     | '/staff/account'
     | '/staff/admin'
@@ -328,6 +347,7 @@ export interface FileRouteTypes {
     | '/parent/'
     | '/staff/'
     | '/student/'
+    | '/api/public/flutterwave'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -337,6 +357,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/track'
     | '/parent/dashboard'
+    | '/parent/fees'
     | '/parent/results'
     | '/staff/account'
     | '/staff/admin'
@@ -358,6 +379,7 @@ export interface FileRouteTypes {
     | '/parent'
     | '/staff'
     | '/student'
+    | '/api/public/flutterwave'
   id:
     | '__root__'
     | '/'
@@ -370,6 +392,7 @@ export interface FileRouteTypes {
     | '/student'
     | '/track'
     | '/parent/dashboard'
+    | '/parent/fees'
     | '/parent/results'
     | '/staff/account'
     | '/staff/admin'
@@ -391,6 +414,7 @@ export interface FileRouteTypes {
     | '/parent/'
     | '/staff/'
     | '/student/'
+    | '/api/public/flutterwave'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -403,6 +427,7 @@ export interface RootRouteChildren {
   StaffRoute: typeof StaffRouteWithChildren
   StudentRoute: typeof StudentRouteWithChildren
   TrackRoute: typeof TrackRoute
+  ApiPublicFlutterwaveRoute: typeof ApiPublicFlutterwaveRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -482,6 +507,13 @@ declare module '@tanstack/react-router' {
       path: '/dashboard'
       fullPath: '/parent/dashboard'
       preLoaderRoute: typeof ParentDashboardRouteImport
+      parentRoute: typeof ParentRoute
+    }
+    '/parent/fees': {
+      id: '/parent/fees'
+      path: '/fees'
+      fullPath: '/parent/fees'
+      preLoaderRoute: typeof ParentFeesRouteImport
       parentRoute: typeof ParentRoute
     }
     '/parent/results': {
@@ -624,17 +656,26 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof StudentSubjectsRouteImport
       parentRoute: typeof StudentRoute
     }
+    '/api/public/flutterwave': {
+      id: '/api/public/flutterwave'
+      path: '/api/public/flutterwave'
+      fullPath: '/api/public/flutterwave'
+      preLoaderRoute: typeof ApiPublicFlutterwaveRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 interface ParentRouteChildren {
   ParentDashboardRoute: typeof ParentDashboardRoute
+  ParentFeesRoute: typeof ParentFeesRoute
   ParentResultsRoute: typeof ParentResultsRoute
   ParentIndexRoute: typeof ParentIndexRoute
 }
 
 const ParentRouteChildren: ParentRouteChildren = {
   ParentDashboardRoute: ParentDashboardRoute,
+  ParentFeesRoute: ParentFeesRoute,
   ParentResultsRoute: ParentResultsRoute,
   ParentIndexRoute: ParentIndexRoute,
 }
@@ -707,6 +748,7 @@ const rootRouteChildren: RootRouteChildren = {
   StaffRoute: StaffRouteWithChildren,
   StudentRoute: StudentRouteWithChildren,
   TrackRoute: TrackRoute,
+  ApiPublicFlutterwaveRoute: ApiPublicFlutterwaveRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
