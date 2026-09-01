@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 
-import { StatCard } from "@/components/portal-shell";
+import { PageHeader, StatCard } from "@/components/portal-shell";
 import { studentOverview } from "@/lib/portal.functions";
 
 export const Route = createFileRoute("/student/")({
@@ -35,18 +35,15 @@ function StudentDashboard() {
     .reduce((s, f) => s + Number(f["amount"] ?? 0), 0);
 
   return (
-    <div className="space-y-8">
-      <header>
-        <h1 className="font-display text-3xl font-bold">
-          Welcome, {String(data.profile?.["first_name"] ?? "Student")}
-        </h1>
-        <p className="text-muted-foreground">
-          {String(data.profile?.["class_level"] ?? "")} ·{" "}
-          {String(data.profile?.["admission_id"] ?? "")}
-        </p>
-      </header>
+    <div className="space-y-6 sm:space-y-8">
+      <PageHeader
+        title={`Welcome, ${String(data.profile?.["first_name"] ?? "Student")}`}
+        subtitle={`${String(data.profile?.["class_level"] ?? "")} · ${String(
+          data.profile?.["admission_id"] ?? "",
+        )}`}
+      />
 
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
         <StatCard label="Subjects recorded" value={scores.length} />
         <StatCard label="Term average" value={average} hint="Across recorded subjects" />
         <StatCard label="Pending assignments" value={pending} />
@@ -54,15 +51,15 @@ function StudentDashboard() {
       </div>
 
       <section>
-        <h2 className="font-display text-xl font-semibold">Latest notices</h2>
+        <h2 className="font-display text-lg font-semibold sm:text-xl">Latest notices</h2>
         <div className="mt-3 space-y-3">
           {data.notices.length === 0 ? (
             <p className="text-sm text-muted-foreground">No notices yet.</p>
           ) : null}
           {data.notices.map((n) => (
             <div key={String(n["id"])} className="rounded-lg border border-border bg-card p-4">
-              <p className="font-semibold">{String(n["title"])}</p>
-              <p className="text-sm text-muted-foreground">{String(n["content"])}</p>
+              <p className="font-semibold break-words">{String(n["title"])}</p>
+              <p className="text-sm text-muted-foreground break-words">{String(n["content"])}</p>
             </div>
           ))}
         </div>
