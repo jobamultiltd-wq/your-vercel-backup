@@ -5,8 +5,8 @@ export type SessionUser = {
   id: string;
   name: string;
   email: string;
-  staffRole?: string;
-  classLevel?: string;
+  staffRole?: string | undefined;
+  classLevel?: string | undefined;
 };
 
 export const getSession = createServerFn({ method: "GET" }).handler(

@@ -362,15 +362,15 @@ export function buildOfficialReportCardPDF(data: ReportCardData): jsPDF {
 
   sideY += 4.5;
   const defaultAffective = [
-    { name: 'PUNCTUALITY', score: data.affectiveSkills?.punctuality || 5 },
-    { name: 'POLITENESS', score: data.affectiveSkills?.politeness || 5 },
-    { name: 'NEATNESS', score: data.affectiveSkills?.neatness || 5 },
-    { name: 'HONESTY', score: data.affectiveSkills?.honesty || 5 },
-    { name: 'LEADERSHIP SKILL', score: data.affectiveSkills?.leadership || 4 },
-    { name: 'COOPERATION', score: data.affectiveSkills?.cooperation || 5 },
-    { name: 'ATTENTIVENESS', score: data.affectiveSkills?.attentiveness || 5 },
-    { name: 'PERSEVERANCE', score: data.affectiveSkills?.perseverance || 5 },
-    { name: 'ATTITUDE TO WORK', score: data.affectiveSkills?.attitude_to_work || 5 },
+    { name: 'PUNCTUALITY', score: data.affectiveSkills?['punctuality'] || 5 },
+    { name: 'POLITENESS', score: data.affectiveSkills?['politeness'] || 5 },
+    { name: 'NEATNESS', score: data.affectiveSkills?['neatness'] || 5 },
+    { name: 'HONESTY', score: data.affectiveSkills?['honesty'] || 5 },
+    { name: 'LEADERSHIP SKILL', score: data.affectiveSkills?['leadership'] || 4 },
+    { name: 'COOPERATION', score: data.affectiveSkills?['cooperation'] || 5 },
+    { name: 'ATTENTIVENESS', score: data.affectiveSkills?['attentiveness'] || 5 },
+    { name: 'PERSEVERANCE', score: data.affectiveSkills?['perseverance'] || 5 },
+    { name: 'ATTITUDE TO WORK', score: data.affectiveSkills?['attitude_to_work'] || 5 },
   ];
 
   defaultAffective.forEach((trait) => {
@@ -399,11 +399,11 @@ export function buildOfficialReportCardPDF(data: ReportCardData): jsPDF {
 
   sideY += 4.5;
   const defaultPsychomotor = [
-    { name: 'HANDWRITING', score: data.psychomotorSkills?.handwriting || 4 },
-    { name: 'VERBAL FLUENCY', score: data.psychomotorSkills?.verbal_fluency || 5 },
-    { name: 'SPORTS & GAMES', score: data.psychomotorSkills?.sports || 4 },
-    { name: 'HANDLING TOOLS', score: data.psychomotorSkills?.handling_tools || 5 },
-    { name: 'DRAWING & ART', score: data.psychomotorSkills?.drawing_painting || 4 },
+    { name: 'HANDWRITING', score: data.psychomotorSkills?['handwriting'] || 4 },
+    { name: 'VERBAL FLUENCY', score: data.psychomotorSkills?['verbal_fluency'] || 5 },
+    { name: 'SPORTS & GAMES', score: data.psychomotorSkills?['sports'] || 4 },
+    { name: 'HANDLING TOOLS', score: data.psychomotorSkills?['handling_tools'] || 5 },
+    { name: 'DRAWING & ART', score: data.psychomotorSkills?['drawing_painting'] || 4 },
   ];
 
   defaultPsychomotor.forEach((trait) => {
