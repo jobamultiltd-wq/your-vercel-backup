@@ -437,6 +437,68 @@ export const listStudents = createServerFn({ method: "GET" }).handler(async () =
   return data ?? [];
 });
 
+export const classCatalogue = createServerFn({ method: "GET" }).handler(async () => {
+  const { getDb, requirePermission } = await import("./portal.server");
+  await requirePermission("students.view");
+  const db = getDb();
+  const settings = await readSettings();
+  const [{ data: students }, { data: applications }] = await Promise.all([
+    db.from("student_profiles").select("admission_id, first_name, last_name, class_level, student_email"),
+    db.from("admissions").select("id, first_name, last_name, class_applying_for, payment_status, guardian_email"),
+  ]);
+  const profileIds = new Set((students ?? []).map((s) => String(s["admission_id"])));
+  const levels = settings.academic.classLevels;
+  const bucket = (level: string) => ({
+    level,
+    enrolled: (students ?? [])
+      .filter((s) => String(s["class_level"] ?? "") === level)
+      .map((s) => ({
+        id: String(s["admission_id"]),
+        name: `${String(s["first_name"] ?? "")} ${String(s["last_name"] ?? "")}`.trim(),
+        email: String(s["student_email"] ?? ""),
+      })),
+    applicants: (applications ?? [])
+      .filter(
+        (a) =>
+          String(a["class_applying_for"] ?? "") === level && !profileIds.has(String(a["id"])),
+      )
+      .map((a) => ({
+        id: String(a["id"]),
+        name: `${String(a["first_name"] ?? "")} ${String(a["last_name"] ?? "")}`.trim(),
+        status: String(a["payment_status"] ?? "Pending Verification"),
+        email: String(a["guardian_email"] ?? ""),
+      })),
+  });
+  const known = levels.map(bucket);
+  const unassigned = {
+    level: "Unassigned / other",
+    enrolled: (students ?? [])
+      .filter((s) => !levels.includes(String(s["class_level"] ?? "")))
+      .map((s) => ({
+        id: String(s["admission_id"]),
+        name: `${String(s["first_name"] ?? "")} ${String(s["last_name"] ?? "")}`.trim(),
+        email: String(s["student_email"] ?? ""),
+      })),
+    applicants: (applications ?? [])
+      .filter(
+        (a) =>
+          !levels.includes(String(a["class_applying_for"] ?? "")) && !profileIds.has(String(a["id"])),
+      )
+      .map((a) => ({
+        id: String(a["id"]),
+        name: `${String(a["first_name"] ?? "")} ${String(a["last_name"] ?? "")}`.trim(),
+        status: String(a["payment_status"] ?? "Pending Verification"),
+        email: String(a["guardian_email"] ?? ""),
+      })),
+  };
+  const classes = [...known, unassigned].filter(
+    (c) => c.level !== "Unassigned / other" || c.enrolled.length + c.applicants.length > 0,
+  );
+  return { session: settings.academic.session, classes };
+});
+
+
+
 export const ADMISSION_STATUSES = [
   "Pending Verification",
   "Paid",
