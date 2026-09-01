@@ -438,6 +438,7 @@ export const enrollStudent = createServerFn({ method: "POST" })
     if (!adm) return { ok: false as const, error: "Admission not found." };
 
     const password = `JIA${Math.random().toString(36).slice(2, 8).toUpperCase()}`;
+    const { hashPassword } = await import("./portal.server");
     const email = `${String(adm["first_name"]).toLowerCase()}.${String(adm["surname"]).toLowerCase()}@student.jobamultiltd.com`;
     const { error } = await db.from("student_profiles").upsert(
       {
@@ -449,7 +450,7 @@ export const enrollStudent = createServerFn({ method: "POST" })
         class_level: adm["class_applying_for"],
         specialized_track: adm["specialized_track"],
         schooling_option: adm["schooling_option"],
-        portal_password_hash: password,
+        portal_password_hash: await hashPassword(password),
         updated_at: new Date().toISOString(),
       },
       { onConflict: "admission_id" },
@@ -677,7 +678,8 @@ export const saveStaffMember = createServerFn({ method: "POST" })
       updated_at: new Date().toISOString(),
     };
     if (data.password && data.password.trim().length >= 6) {
-      row["password_hash"] = data.password.trim();
+      const { hashPassword } = await import("./portal.server");
+      row["password_hash"] = await hashPassword(data.password.trim());
     }
 
     if (data.id) {
