@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { toast } from "sonner";
 
-import { PageHeading, PublicPage } from "@/components/site-chrome";
+import { PageHeading, PublicPage, useSiteSettings } from "@/components/site-chrome";
 import { UploadField } from "@/components/upload-field";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -40,6 +40,18 @@ const POSITIONS = [
 ];
 
 function CareersPage() {
+  const siteSettings = useSiteSettings();
+  if (!siteSettings.portal.careersOpen) {
+    return (
+      <PublicPage>
+        <PageHeading title="Recruitment is currently closed" />
+        <div className="mx-auto max-w-3xl px-4 py-12">
+          <p className="text-muted-foreground">There are no open vacancies at the moment. Please check back later.</p>
+        </div>
+      </PublicPage>
+    );
+  }
+
   const [busy, setBusy] = useState(false);
   const [cvUrl, setCvUrl] = useState<string | null>(null);
   const [done, setDone] = useState<string | null>(null);
