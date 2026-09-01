@@ -121,7 +121,11 @@ function AdmissionsAdmin() {
                       });
                       setBusy(null);
                       if (res.ok) {
-                        toast.success("Status updated and guardian notified.");
+                        toast.success(
+                          res.enrolled
+                            ? "Approved — student account created and confirmation email sent."
+                            : "Status updated and guardian notified.",
+                        );
                         void refetch();
                       } else toast.error(res.error);
                     }}
