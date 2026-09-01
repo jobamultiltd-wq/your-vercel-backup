@@ -131,7 +131,7 @@ export const parentOverview = createServerFn({ method: "GET" }).handler(async ()
   const parent = await requireParent();
   const db = getDb();
   const id = parent.admissionId!;
-  const [profile, scores, fees, attendance, notices, assignments] = await Promise.all([
+  const [profile, scores, fees, attendance, notices, assignments, admission] = await Promise.all([
     db.from("student_profiles").select("*").eq("admission_id", id).maybeSingle(),
     db.from("exam_scores").select("*").eq("admission_id", id),
     db.from("fee_payments").select("*").eq("admission_id", id),
