@@ -103,10 +103,10 @@ function ResultsPage() {
             {scores.map((s) => (
               <tr key={String(s["id"])} className="border-t border-border">
                 <td className="px-3 py-2">{String(s["subject"])}</td>
-                <td className="px-3 py-2">{String(s["ca1"] ?? "-")}</td>
-                <td className="px-3 py-2">{String(s["ca2"] ?? "-")}</td>
-                <td className="px-3 py-2">{String(s["exam"] ?? "-")}</td>
-                <td className="px-3 py-2 font-semibold">{String(s["total"] ?? "-")}</td>
+                <td className="px-3 py-2">{String(s["ca1_score"] ?? "-")}</td>
+                <td className="px-3 py-2">{String(s["ca2_score"] ?? "-")}</td>
+                <td className="px-3 py-2">{String(s["exam_score"] ?? "-")}</td>
+                <td className="px-3 py-2 font-semibold">{String(s["total_score"] ?? "-")}</td>
                 <td className="px-3 py-2">{String(s["grade"] ?? "-")}</td>
               </tr>
             ))}
