@@ -138,8 +138,9 @@ export const trackApplication = createServerFn({ method: "POST" })
     const { data: row } = await getDb()
       .from("admissions")
       .select(
-        "id, first_name, surname, class_applying_for, application_status, payment_status, status, created_at",
+        "id, first_name, surname, class_applying_for, payment_status, payment_reference, created_at",
       )
+
       .eq("id", data.reference.trim())
       .maybeSingle();
     return row ?? null;
