@@ -121,7 +121,11 @@ function AdmissionsAdmin() {
                       });
                       setBusy(null);
                       if (res.ok) {
-                        toast.success("Status updated and guardian notified.");
+                        toast.success(
+                          res.enrolled
+                            ? "Approved — student account created and confirmation email sent."
+                            : "Status updated and guardian notified.",
+                        );
                         void refetch();
                       } else toast.error(res.error);
                     }}
@@ -151,12 +155,20 @@ function AdmissionsAdmin() {
                       });
                       setBusy(null);
                       if (res.ok) {
-                        toast.success("Application approved — guardian notified.");
+                        if (res.enrolled) {
+                          toast.success(
+                            `Approved and enrolled — account created (${res.email}) and confirmation email sent.`,
+                          );
+                        } else if (res.enrolmentError) {
+                          toast.warning(`Approved, but account not created: ${res.enrolmentError}`);
+                        } else {
+                          toast.success("Application approved — guardian notified.");
+                        }
                         void refetch();
                       } else toast.error(res.error);
                     }}
                   >
-                    Approve
+                    Approve &amp; enrol
                   </Button>
 
                   <Button
@@ -180,6 +192,7 @@ function AdmissionsAdmin() {
                   >
                     {enrolled ? "Re-issue credentials" : "Enrol & confirm"}
                   </Button>
+
                 </div>
               </div>
             </article>
