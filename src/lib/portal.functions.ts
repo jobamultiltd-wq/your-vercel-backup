@@ -588,3 +588,134 @@ export const recordFee = createServerFn({ method: "POST" })
     if (error) return { ok: false as const, error: error.message };
     return { ok: true as const };
   });
+
+/* ------------------------------------------------------------------ */
+/* Admin: portal settings & staff management                           */
+/* ------------------------------------------------------------------ */
+
+export const getPortalSettings = createServerFn({ method: "GET" }).handler(async () => {
+  const { getDb } = await import("./portal.server");
+  const { DEFAULT_SETTINGS } = await import("./settings");
+  const { data, error } = await getDb().from("portal_settings").select("key, value");
+  if (error) {
+    return { settings: DEFAULT_SETTINGS, ready: false, error: error.message };
+  }
+  const merged = structuredClone(DEFAULT_SETTINGS) as Record<string, Record<string, unknown>>;
+  for (const row of data ?? []) {
+    const key = String(row["key"]);
+    if (merged[key]) Object.assign(merged[key], (row["value"] as object) ?? {});
+  }
+  return { settings: merged as unknown as typeof DEFAULT_SETTINGS, ready: true, error: null };
+});
+
+export const savePortalSettings = createServerFn({ method: "POST" })
+  .inputValidator((d: { key: "school" | "academic" | "portal"; value: Record<string, unknown> }) => d)
+  .handler(async ({ data }) => {
+    const { getDb, requireAdmin } = await import("./portal.server");
+    try {
+      await requireAdmin();
+    } catch {
+      return { ok: false as const, error: "Administrator access required." };
+    }
+    const { error } = await getDb()
+      .from("portal_settings")
+      .upsert(
+        { key: data.key, value: data.value, updated_at: new Date().toISOString() },
+        { onConflict: "key" },
+      );
+    if (error) return { ok: false as const, error: error.message };
+    return { ok: true as const };
+  });
+
+export const listStaff = createServerFn({ method: "GET" }).handler(async () => {
+  const { getDb, requireAdmin } = await import("./portal.server");
+  try {
+    await requireAdmin();
+  } catch {
+    return [] as Record<string, unknown>[];
+  }
+  const { data } = await getDb()
+    .from("staff_users")
+    .select("id, staff_id, full_name, email, phone, role, department, assigned_classes, status, created_at")
+    .order("full_name");
+  return (data ?? []) as Record<string, unknown>[];
+});
+
+export const saveStaffMember = createServerFn({ method: "POST" })
+  .inputValidator(
+    (d: {
+      id?: string;
+      staffId: string;
+      fullName: string;
+      email: string;
+      phone: string;
+      role: string;
+      department: string;
+      assignedClasses: string[];
+      status: string;
+      password?: string;
+    }) => d,
+  )
+  .handler(async ({ data }) => {
+    const { getDb, requireAdmin } = await import("./portal.server");
+    let admin;
+    try {
+      admin = await requireAdmin();
+    } catch {
+      return { ok: false as const, error: "Administrator access required." };
+    }
+    const db = getDb();
+    const row: Record<string, unknown> = {
+      staff_id: data.staffId.trim(),
+      full_name: data.fullName.trim(),
+      email: data.email.trim().toLowerCase(),
+      phone: data.phone.trim(),
+      role: data.role,
+      department: data.department.trim(),
+      assigned_classes: data.assignedClasses,
+      status: data.status,
+      updated_at: new Date().toISOString(),
+    };
+    if (data.password && data.password.trim().length >= 6) {
+      row["password_hash"] = data.password.trim();
+    }
+
+    if (data.id) {
+      if (data.id === admin.id && data.role !== "admin") {
+        return { ok: false as const, error: "You cannot remove your own administrator role." };
+      }
+      const { error } = await db.from("staff_users").update(row).eq("id", data.id);
+      if (error) return { ok: false as const, error: error.message };
+      return { ok: true as const };
+    }
+
+    if (!data.password || data.password.trim().length < 6) {
+      return { ok: false as const, error: "A password of at least 6 characters is required." };
+    }
+    row["id"] = `usr-${Date.now().toString(36)}`;
+    row["created_at"] = new Date().toISOString();
+    const { error } = await db.from("staff_users").insert(row);
+    if (error) return { ok: false as const, error: error.message };
+    return { ok: true as const };
+  });
+
+export const setStaffStatus = createServerFn({ method: "POST" })
+  .inputValidator((d: { id: string; status: string }) => d)
+  .handler(async ({ data }) => {
+    const { getDb, requireAdmin } = await import("./portal.server");
+    let admin;
+    try {
+      admin = await requireAdmin();
+    } catch {
+      return { ok: false as const, error: "Administrator access required." };
+    }
+    if (data.id === admin.id) {
+      return { ok: false as const, error: "You cannot deactivate your own account." };
+    }
+    const { error } = await getDb()
+      .from("staff_users")
+      .update({ status: data.status, updated_at: new Date().toISOString() })
+      .eq("id", data.id);
+    if (error) return { ok: false as const, error: error.message };
+    return { ok: true as const };
+  });

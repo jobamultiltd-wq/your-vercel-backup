@@ -48,6 +48,22 @@ export async function requireStaff(): Promise<PortalSession> {
   return user;
 }
 
+export async function requireAdmin(): Promise<PortalSession> {
+  const user = await requireStaff();
+  const role = (user.staffRole ?? "").toLowerCase();
+  if (role !== "admin" && role !== "principal") throw new Error("FORBIDDEN");
+  const db = getDb();
+  const { data } = await db
+    .from("staff_users")
+    .select("id, role, status")
+    .eq("staff_id", user.id!)
+    .maybeSingle();
+  if (!data || data["status"] !== "Active") throw new Error("FORBIDDEN");
+  const dbRole = String(data["role"] ?? "").toLowerCase();
+  if (dbRole !== "admin" && dbRole !== "principal") throw new Error("FORBIDDEN");
+  return { ...user, id: String(data["id"]) };
+}
+
 /** Passwords in the legacy database are stored either in plain text or as sha256 hex. */
 export async function passwordMatches(input: string, stored: string | null) {
   if (!stored) return false;
