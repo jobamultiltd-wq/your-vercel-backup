@@ -62,6 +62,20 @@ export function buildOfficialReportCardPDF(data: ReportCardData): jsPDF {
   doc.setLineWidth(0.2);
   doc.rect(margin + 1, margin + 1, contentWidth - 2, pageHeight - margin * 2 - 2);
 
+  // 1b. Diagonal Watermark (security mark referenced in the footer note)
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(34);
+  doc.setTextColor(243, 246, 250); // very light blue-grey
+  doc.text('JOBA INTERNATIONAL ACADEMY', pageWidth / 2, pageHeight / 2 + 60, {
+    align: 'center',
+    angle: -45,
+  });
+  doc.text('JOBA INTERNATIONAL ACADEMY', pageWidth / 2, pageHeight / 2 - 60, {
+    align: 'center',
+    angle: -45,
+  });
+
+
   // 2. School Letterhead Header
   // Top left school crest circle
   const crestX = margin + 4;
