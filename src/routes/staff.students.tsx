@@ -30,15 +30,36 @@ function StudentsPage() {
     JSON.stringify(s).toLowerCase().includes(q.toLowerCase()),
   );
 
+  const counts = new Map<string, number>();
+  for (const s of data) {
+    const c = String(s["class_level"] ?? "Unassigned");
+    counts.set(c, (counts.get(c) ?? 0) + 1);
+  }
+
   return (
     <div className="space-y-6">
       <h1 className="font-display text-3xl font-bold">Students</h1>
+      <div className="flex flex-wrap gap-2">
+        {[...counts.entries()].sort().map(([c, n]) => (
+          <button
+            key={c}
+            type="button"
+            onClick={() => setQ(q === c ? "" : c)}
+            className={`rounded-full border px-3 py-1 text-sm ${
+              q === c ? "border-accent bg-accent/10 text-accent" : "border-border"
+            }`}
+          >
+            {c} · {n}
+          </button>
+        ))}
+      </div>
       <Input
         placeholder="Search by name, class or admission ID…"
         value={q}
         onChange={(e) => setQ(e.target.value)}
         className="max-w-md"
       />
+
       <div className="overflow-x-auto rounded-lg border border-border">
         <table className="w-full text-sm">
           <thead className="bg-secondary text-left">
