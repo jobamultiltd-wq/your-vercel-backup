@@ -494,8 +494,22 @@ export const saveExamScore = createServerFn({ method: "POST" })
       .eq("term", data.term)
       .eq("session", data.session)
       .maybeSingle();
-    const payload = { ...data, score: total, total, grade, updated_at: new Date().toISOString() };
-    const { error } = existing
+    const { admission_id, subject, term, session } = data;
+    const payload = {
+      admission_id,
+      subject,
+      term,
+      session,
+      exam_type: "Terminal Exam",
+      ca1_score: Number(data.ca1),
+      ca2_score: Number(data.ca2),
+      exam_score: Number(data.exam),
+      total_score: total,
+      score: total,
+      grade,
+      updated_at: new Date().toISOString(),
+    };
+
       ? await db.from("exam_scores").update(payload).eq("id", existing["id"])
       : await db.from("exam_scores").insert(payload);
     if (error) return { ok: false as const, error: error.message };
