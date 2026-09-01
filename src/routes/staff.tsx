@@ -10,6 +10,8 @@ const NAV: { to: string; label: string; capability?: Capability }[] = [
   { to: "/staff/attendance", label: "Attendance", capability: "attendance.clock" },
   { to: "/staff/admissions", label: "Admissions", capability: "admissions.review" },
   { to: "/staff/students", label: "Students", capability: "students.view" },
+  { to: "/staff/classes", label: "Class Catalogue", capability: "students.view" },
+
   { to: "/staff/scores", label: "Score Entry", capability: "scores.enter" },
   { to: "/staff/assignments", label: "Assignments", capability: "assignments.manage" },
   { to: "/staff/notices", label: "Notices", capability: "notices.publish" },
