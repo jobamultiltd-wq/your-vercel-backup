@@ -1083,3 +1083,61 @@ export const sendFeeReminder = createServerFn({ method: "POST" })
     if (!res.sent) return { ok: false as const, error: "Email gateway rejected the message." };
     return { ok: true as const, email: target.email };
   });
+
+/* ------------------------------------------------------------------ */
+/* Timetable                                                           */
+/* ------------------------------------------------------------------ */
+
+export const getTimetable = createServerFn({ method: "GET" }).handler(async () => {
+  const { getDb, requireStaff } = await import("./portal.server");
+  const { normaliseTimetable } = await import("./timetable");
+  try {
+    await requireStaff();
+  } catch {
+    return { data: {}, teachers: [], ready: false, error: "Staff access required." };
+  }
+  const db = getDb();
+  const [{ data: rows, error }, { data: staff }] = await Promise.all([
+    db.from("portal_settings").select("value").eq("key", "timetable").maybeSingle(),
+    db.from("staff_users").select("full_name, role, status").order("full_name"),
+  ]);
+  const teachers = (staff ?? [])
+    .filter((s) => (s["status"] ?? "active") === "active")
+    .map((s) => String(s["full_name"] ?? ""))
+    .filter(Boolean);
+  if (error) {
+    return { data: {}, teachers, ready: false, error: error.message };
+  }
+  const raw = ((rows?.["value"] as Record<string, unknown>) ?? {}) as Record<string, unknown>;
+  const data: Record<string, ReturnType<typeof normaliseTimetable>> = {};
+  for (const [cls, table] of Object.entries(raw)) data[cls] = normaliseTimetable(table);
+  return { data, teachers, ready: true, error: null };
+});
+
+export const saveTimetable = createServerFn({ method: "POST" })
+  .inputValidator((d: { classLevel: string; table: unknown }) => d)
+  .handler(async ({ data }) => {
+    const { getDb, requirePermission } = await import("./portal.server");
+    const { normaliseTimetable } = await import("./timetable");
+    try {
+      await requirePermission("timetable.manage");
+    } catch {
+      return { ok: false as const, error: "You do not have permission to edit the timetable." };
+    }
+    const classLevel = data.classLevel.trim();
+    if (!classLevel) return { ok: false as const, error: "Select a class first." };
+    const db = getDb();
+    const { data: row, error: readError } = await db
+      .from("portal_settings")
+      .select("value")
+      .eq("key", "timetable")
+      .maybeSingle();
+    if (readError) return { ok: false as const, error: readError.message };
+    const value = ((row?.["value"] as Record<string, unknown>) ?? {}) as Record<string, unknown>;
+    value[classLevel] = normaliseTimetable(data.table);
+    const { error } = await db
+      .from("portal_settings")
+      .upsert({ key: "timetable", value, updated_at: new Date().toISOString() }, { onConflict: "key" });
+    if (error) return { ok: false as const, error: error.message };
+    return { ok: true as const };
+  });
