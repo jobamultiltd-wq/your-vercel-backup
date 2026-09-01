@@ -170,7 +170,7 @@ function AdmissionsPageForm() {
         </Section>
 
         <Section title="Placement">
-          <Field name="class_applying_for" label="Class applying for" required options={CLASSES} />
+          <Field name="class_applying_for" label="Class applying for" required options={classLevels} />
           <Field
             name="schooling_option"
             label="Schooling option"
@@ -182,7 +182,11 @@ function AdmissionsPageForm() {
             label="Specialised track"
             options={["Music Conservatory", "ICT Track", "Vocational Trade", "None"]}
           />
-          <Field name="academic_session" label="Academic session" />
+          <div className="space-y-1.5">
+            <Label htmlFor="academic_session">Academic session</Label>
+            <Input id="academic_session" name="academic_session" value={academic.session} readOnly />
+          </div>
+
           <Field name="last_school_attended" label="Last school attended" />
           <Field name="last_class_passed" label="Last class passed" />
         </Section>
