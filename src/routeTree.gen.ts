@@ -10,12 +10,30 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AdmissionsRouteImport } from './routes/admissions'
+import { Route as CareersRouteImport } from './routes/careers'
+import { Route as HolidayCoachingRouteImport } from './routes/holiday-coaching'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as TrackRouteImport } from './routes/track'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdmissionsRoute = AdmissionsRouteImport.update({
+  id: '/admissions',
+  path: '/admissions',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CareersRoute = CareersRouteImport.update({
+  id: '/careers',
+  path: '/careers',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const HolidayCoachingRoute = HolidayCoachingRouteImport.update({
+  id: '/holiday-coaching',
+  path: '/holiday-coaching',
   getParentRoute: () => rootRouteImport,
 } as any)
 const LoginRoute = LoginRouteImport.update({
@@ -31,30 +49,51 @@ const TrackRoute = TrackRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/admissions': typeof AdmissionsRoute
+  '/careers': typeof CareersRoute
+  '/holiday-coaching': typeof HolidayCoachingRoute
   '/login': typeof LoginRoute
   '/track': typeof TrackRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/admissions': typeof AdmissionsRoute
+  '/careers': typeof CareersRoute
+  '/holiday-coaching': typeof HolidayCoachingRoute
   '/login': typeof LoginRoute
   '/track': typeof TrackRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/admissions': typeof AdmissionsRoute
+  '/careers': typeof CareersRoute
+  '/holiday-coaching': typeof HolidayCoachingRoute
   '/login': typeof LoginRoute
   '/track': typeof TrackRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/login' | '/track'
+  fullPaths:
+    '/' | '/admissions' | '/careers' | '/holiday-coaching' | '/login' | '/track'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/login' | '/track'
-  id: '__root__' | '/' | '/login' | '/track'
+  to:
+    '/' | '/admissions' | '/careers' | '/holiday-coaching' | '/login' | '/track'
+  id:
+    | '__root__'
+    | '/'
+    | '/admissions'
+    | '/careers'
+    | '/holiday-coaching'
+    | '/login'
+    | '/track'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AdmissionsRoute: typeof AdmissionsRoute
+  CareersRoute: typeof CareersRoute
+  HolidayCoachingRoute: typeof HolidayCoachingRoute
   LoginRoute: typeof LoginRoute
   TrackRoute: typeof TrackRoute
 }
@@ -66,6 +105,27 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admissions': {
+      id: '/admissions'
+      path: '/admissions'
+      fullPath: '/admissions'
+      preLoaderRoute: typeof AdmissionsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/careers': {
+      id: '/careers'
+      path: '/careers'
+      fullPath: '/careers'
+      preLoaderRoute: typeof CareersRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/holiday-coaching': {
+      id: '/holiday-coaching'
+      path: '/holiday-coaching'
+      fullPath: '/holiday-coaching'
+      preLoaderRoute: typeof HolidayCoachingRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/login': {
@@ -87,6 +147,9 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AdmissionsRoute: AdmissionsRoute,
+  CareersRoute: CareersRoute,
+  HolidayCoachingRoute: HolidayCoachingRoute,
   LoginRoute: LoginRoute,
   TrackRoute: TrackRoute,
 }

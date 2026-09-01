@@ -64,7 +64,10 @@ function HolidayPage() {
           setBusy(true);
           const res = await submitHolidayCoaching({ data: payload });
           setBusy(false);
-          if (!res.ok) return toast.error(res.error ?? "Submission failed");
+          if (!res.ok) {
+            toast.error(res.error ?? "Submission failed");
+            return;
+          }
           setDone(res.id);
         }}
       >

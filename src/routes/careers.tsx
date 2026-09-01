@@ -79,7 +79,10 @@ function CareersPage() {
           setBusy(true);
           const res = await submitCareer({ data: payload });
           setBusy(false);
-          if (!res.ok) return toast.error(res.error ?? "Submission failed");
+          if (!res.ok) {
+            toast.error(res.error ?? "Submission failed");
+            return;
+          }
           setDone(res.id);
         }}
       >
