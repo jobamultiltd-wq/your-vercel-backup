@@ -632,13 +632,13 @@ export const listStaff = createServerFn({ method: "GET" }).handler(async () => {
   try {
     await requireAdmin();
   } catch {
-    return [] as Record<string, unknown>[];
+    return [];
   }
   const { data } = await getDb()
     .from("staff_users")
     .select("id, staff_id, full_name, email, phone, role, department, assigned_classes, status, created_at")
     .order("full_name");
-  return (data ?? []) as Record<string, unknown>[];
+  return data ?? [];
 });
 
 export const saveStaffMember = createServerFn({ method: "POST" })
