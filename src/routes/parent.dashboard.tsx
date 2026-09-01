@@ -73,6 +73,28 @@ function ParentDashboard() {
         </p>
       </div>
 
+      {data.admission ? (
+        <section className="rounded-lg border border-border bg-card p-4">
+          <h2 className="font-display text-lg font-semibold">Admission status</h2>
+          <div className="mt-2 flex flex-wrap items-center gap-x-6 gap-y-2 text-sm">
+            <span>
+              <span className="text-muted-foreground">Reference: </span>
+              <strong>{String(data.admission["id"])}</strong>
+            </span>
+            <span>
+              <span className="text-muted-foreground">Class: </span>
+              <strong>{String(data.admission["class_applying_for"] ?? "—")}</strong>
+            </span>
+            <span>
+              <span className="text-muted-foreground">Status: </span>
+              <span className="inline-block rounded-full bg-accent/15 px-2.5 py-0.5 text-xs font-semibold text-accent-foreground">
+                {String(data.admission["payment_status"] ?? "Pending Verification")}
+              </span>
+            </span>
+          </div>
+        </section>
+      ) : null}
+
       <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
         <Stat label="Subjects" value={String(scores.length)} />
         <Stat label="Average" value={scores.length ? `${average.toFixed(1)}%` : "—"} />
