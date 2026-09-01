@@ -13,6 +13,7 @@ export const Route = createFileRoute("/parent")({
 const NAV = [
   { to: "/parent/dashboard", label: "Dashboard" },
   { to: "/parent/results", label: "Results & Report Card" },
+  { to: "/parent/fees", label: "Pay Fees" },
 ];
 
 function ParentLayout() {
