@@ -95,7 +95,8 @@ function AdmissionsPage() {
 }
 
 function AdmissionsPageForm() {
-
+  const academic = useSiteSettings().academic;
+  const classLevels = academic.classLevels.length ? academic.classLevels : FALLBACK_CLASSES;
   const [busy, setBusy] = useState(false);
   const [reference, setReference] = useState<string | null>(null);
   const [docs, setDocs] = useState<Record<string, string>>({});
