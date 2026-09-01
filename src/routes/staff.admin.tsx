@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, redirect } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -19,6 +19,12 @@ import { DEFAULT_SETTINGS, SETTINGS_TABLE_SQL, STAFF_ROLES } from "@/lib/setting
 import type { AcademicSettings, PortalToggles, SchoolSettings } from "@/lib/settings";
 
 export const Route = createFileRoute("/staff/admin")({
+  beforeLoad: async () => {
+    const { getSession } = await import("@/lib/auth.functions");
+    const user = await getSession();
+    const role = (user?.staffRole ?? "").toLowerCase();
+    if (role !== "admin" && role !== "principal") throw redirect({ to: "/staff" });
+  },
   head: () => ({
     meta: [
       { title: "Administration — Joba International Academy Portal" },
