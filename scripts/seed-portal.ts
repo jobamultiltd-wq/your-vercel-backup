@@ -222,6 +222,23 @@ function rng(seed: string) {
   };
 }
 
+
+/** Upsert without relying on DB unique constraints. */
+async function upsertBy(table: string, keys: string[], rows: Record<string, unknown>[]) {
+  for (const row of rows) {
+    let q = db.from(table).select("id");
+    for (const k of keys) q = q.eq(k, row[k] as string);
+    const { data: existing } = await q.maybeSingle();
+    if (existing) {
+      const { error } = await db.from(table).update(row).eq("id", existing["id"]);
+      if (error) throw error;
+    } else {
+      const { error } = await db.from(table).insert(row);
+      if (error) throw error;
+    }
+  }
+}
+
 async function seedAdmissionsAndProfiles(hash: string) {
   const admissions = STUDENTS.map((s) => ({
     id: s.id,
@@ -259,8 +276,7 @@ async function seedAdmissionsAndProfiles(hash: string) {
     payment_reference: `BANK-${s.id.slice(-4)}`,
     updated_at: new Date().toISOString(),
   }));
-  const a = await db.from("admissions").upsert(admissions, { onConflict: "id" });
-  if (a.error) throw a.error;
+  await upsertBy("admissions", ["id"], admissions);
 
   const profiles = STUDENTS.map((s) => ({
     admission_id: s.id,
@@ -274,8 +290,7 @@ async function seedAdmissionsAndProfiles(hash: string) {
     portal_password_hash: hash,
     updated_at: new Date().toISOString(),
   }));
-  const p = await db.from("student_profiles").upsert(profiles, { onConflict: "admission_id" });
-  if (p.error) throw p.error;
+  await upsertBy("student_profiles", ["admission_id"], profiles);
 
   // Give the pre-existing profiles a usable portal password too.
   for (const e of EXISTING) {
@@ -299,10 +314,20 @@ async function seedSubjects(roster: Roster[]) {
     extra_curricular: ["Debate Club", "Press Club"],
     updated_at: new Date().toISOString(),
   }));
-  const { error } = await db
-    .from("student_subject_registrations")
-    .upsert(rows, { onConflict: "admission_id" });
-  if (error) throw error;
+  for (const row of rows) {
+    const { data: existing } = await db
+      .from("student_subject_registrations")
+      .select("admission_id")
+      .eq("admission_id", row.admission_id)
+      .maybeSingle();
+    const { error } = existing
+      ? await db
+          .from("student_subject_registrations")
+          .update(row)
+          .eq("admission_id", row.admission_id)
+      : await db.from("student_subject_registrations").insert(row);
+    if (error) throw error;
+  }
 }
 
 async function seedScoresAndReports(roster: Roster[]) {
@@ -468,8 +493,7 @@ async function seedFees(roster: Roster[]) {
       });
     }
   }
-  const { error } = await db.from("fee_payments").upsert(rows, { onConflict: "reference" });
-  if (error) throw error;
+  await upsertBy("fee_payments", ["reference"], rows);
 }
 
 async function seedAssignments(roster: Roster[]) {
@@ -588,10 +612,7 @@ async function seedStaffAttendance() {
       });
     }
   }
-  const { error } = await db
-    .from("staff_attendance")
-    .upsert(rows, { onConflict: "staff_id,date" });
-  if (error) throw error;
+  await upsertBy("staff_attendance", ["staff_id", "date"], rows);
 }
 
 async function seedNotices() {
