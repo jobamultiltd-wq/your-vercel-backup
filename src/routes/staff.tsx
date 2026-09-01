@@ -14,6 +14,7 @@ const NAV: { to: string; label: string; capability?: Capability }[] = [
 
   { to: "/staff/scores", label: "Score Entry", capability: "scores.enter" },
   { to: "/staff/assignments", label: "Assignments", capability: "assignments.manage" },
+  { to: "/staff/timetable", label: "Timetable", capability: "timetable.manage" },
   { to: "/staff/notices", label: "Notices", capability: "notices.publish" },
   { to: "/staff/fees", label: "Fees", capability: "fees.manage" },
   { to: "/staff/notifications", label: "Parent Alerts", capability: "parents.notify" },

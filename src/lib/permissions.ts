@@ -10,6 +10,7 @@ export const CAPABILITIES = [
   "notices.publish",
   "fees.manage",
   "parents.notify",
+  "timetable.manage",
   "admin.manage",
 ] as const;
 
@@ -25,6 +26,7 @@ export const CAPABILITY_LABELS: Record<Capability, string> = {
   "notices.publish": "Publish notices",
   "fees.manage": "Record fee payments",
   "parents.notify": "Send parent alerts",
+  "timetable.manage": "Manage class & teacher timetables",
   "admin.manage": "Administration console",
 };
 
@@ -41,6 +43,7 @@ export const ROLE_PERMISSIONS: Record<string, Capability[]> = {
     "admissions.enrol",
     "notices.publish",
     "parents.notify",
+    "timetable.manage",
   ],
   bursar: ["attendance.clock", "students.view", "fees.manage", "parents.notify"],
   form_teacher: [
@@ -50,6 +53,7 @@ export const ROLE_PERMISSIONS: Record<string, Capability[]> = {
     "assignments.manage",
     "notices.publish",
     "parents.notify",
+    "timetable.manage",
   ],
   teacher: ["attendance.clock", "students.view", "scores.enter", "assignments.manage"],
   counsellor: ["attendance.clock", "students.view", "parents.notify"],
