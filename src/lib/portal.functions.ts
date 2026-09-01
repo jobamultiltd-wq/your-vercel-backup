@@ -374,7 +374,7 @@ export const attendanceHistory = createServerFn({ method: "GET" }).handler(async
 
 export const listStudents = createServerFn({ method: "GET" }).handler(async () => {
   const { getDb, requireStaff } = await import("./portal.server");
-  await requireStaff();
+  await requirePermission("students.view");
   const { data } = await getDb()
     .from("student_profiles")
     .select("*")
@@ -384,7 +384,7 @@ export const listStudents = createServerFn({ method: "GET" }).handler(async () =
 
 export const listAdmissions = createServerFn({ method: "GET" }).handler(async () => {
   const { getDb, requireStaff } = await import("./portal.server");
-  await requireStaff();
+  await requirePermission("admissions.review");
   const { data } = await getDb()
     .from("admissions")
     .select("*")
@@ -396,7 +396,7 @@ export const updateAdmission = createServerFn({ method: "POST" })
   .inputValidator((d: { id: string; application_status: string; notify?: boolean }) => d)
   .handler(async ({ data }) => {
     const { getDb, requireStaff, sendEmail, emailShell } = await import("./portal.server");
-    await requireStaff();
+    await requirePermission("admissions.review");
     const db = getDb();
     const { data: row, error } = await db
       .from("admissions")
@@ -428,7 +428,7 @@ export const enrollStudent = createServerFn({ method: "POST" })
   .inputValidator((d: { admissionId: string }) => d)
   .handler(async ({ data }) => {
     const { getDb, requireStaff, sendEmail, emailShell } = await import("./portal.server");
-    await requireStaff();
+    await requirePermission("admissions.enrol");
     const db = getDb();
     const { data: adm } = await db
       .from("admissions")
@@ -486,7 +486,7 @@ export const saveExamScore = createServerFn({ method: "POST" })
   )
   .handler(async ({ data }) => {
     const { getDb, requireStaff } = await import("./portal.server");
-    await requireStaff();
+    await requirePermission("scores.enter");
     const db = getDb();
     const total = Number(data.ca1) + Number(data.ca2) + Number(data.exam);
     const grade =
@@ -535,7 +535,7 @@ export const createAssignment = createServerFn({ method: "POST" })
   )
   .handler(async ({ data, context: _c }) => {
     const { getDb, requireStaff } = await import("./portal.server");
-    const user = await requireStaff();
+    const user = await requirePermission("assignments.manage");
     const { error } = await getDb()
       .from("assignments")
       .insert({ ...data, teacher_name: user.name ?? "" });
@@ -547,7 +547,7 @@ export const createNotice = createServerFn({ method: "POST" })
   .inputValidator((d: { title: string; content: string; type: string }) => d)
   .handler(async ({ data }) => {
     const { getDb, requireStaff } = await import("./portal.server");
-    const user = await requireStaff();
+    const user = await requirePermission("notices.publish");
     const { error } = await getDb()
       .from("notices")
       .insert({
@@ -561,7 +561,7 @@ export const createNotice = createServerFn({ method: "POST" })
 
 export const listFees = createServerFn({ method: "GET" }).handler(async () => {
   const { getDb, requireStaff } = await import("./portal.server");
-  await requireStaff();
+  await requirePermission("fees.manage");
   const { data } = await getDb()
     .from("fee_payments")
     .select("*")
@@ -582,7 +582,7 @@ export const recordFee = createServerFn({ method: "POST" })
   )
   .handler(async ({ data }) => {
     const { getDb, requireStaff, sendEmail, emailShell } = await import("./portal.server");
-    await requireStaff();
+    await requirePermission("fees.manage");
     const reference = `PAY-${Date.now().toString(36).toUpperCase()}`;
     const { error } = await getDb().from("fee_payments").insert({ ...data, reference });
     if (error) return { ok: false as const, error: error.message };
@@ -779,7 +779,7 @@ async function findGuardian(admissionId: string): Promise<GuardianTarget | null>
 
 export const listGuardianContacts = createServerFn({ method: "GET" }).handler(async () => {
   const { getDb, requireStaff } = await import("./portal.server");
-  await requireStaff();
+  await requirePermission("parents.notify");
   const { data } = await getDb()
     .from("student_profiles")
     .select("admission_id, first_name, last_name, class_level, guardian_email")
@@ -794,7 +794,7 @@ export const notifyAttendance = createServerFn({ method: "POST" })
   )
   .handler(async ({ data }) => {
     const { requireStaff, sendEmail, emailShell } = await import("./portal.server");
-    await requireStaff();
+    await requirePermission("parents.notify");
     const target = await findGuardian(data.admission_id);
     if (!target) return { ok: false as const, error: "No guardian email on record for this student." };
 
@@ -828,7 +828,7 @@ export const sendFeeReminder = createServerFn({ method: "POST" })
   )
   .handler(async ({ data }) => {
     const { requireStaff, sendEmail, emailShell } = await import("./portal.server");
-    await requireStaff();
+    await requirePermission("parents.notify");
     const target = await findGuardian(data.admission_id);
     if (!target) return { ok: false as const, error: "No guardian email on record for this student." };
 
