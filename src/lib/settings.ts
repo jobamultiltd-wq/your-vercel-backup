@@ -44,7 +44,7 @@ export const DEFAULT_SETTINGS: PortalSettings = {
     phone: "0705 065 6140",
     email: "academy@jobamultiltd.com",
     website: "https://jobamultiltd.com",
-    logoUrl: "",
+    logoUrl: "https://res.cloudinary.com/zdxqwji9/image/upload/v1788291937/joba/brand/school-logo.webp",
     principalName: "",
   },
   academic: {
