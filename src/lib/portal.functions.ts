@@ -39,14 +39,69 @@ function refId(prefix: string) {
     .toUpperCase()}`;
 }
 
+/** Columns that actually exist on public.admissions. */
+const ADMISSION_COLUMNS = new Set([
+  "surname","first_name","other_name","date_of_birth","age","gender","nationality","state_of_origin",
+  "local_government","residential_address","religion","blood_group","genotype","phone_number","email",
+  "passport_photo_url","home_address","residential_address_alt","city_town","state","guardian_name",
+  "guardian_phone","guardian_email","guardian_occupation","last_school_attended","last_class_completed",
+  "previous_school_address","last_exam_result_url","common_entrance_result_url","student_id_birth_cert_url",
+  "medical_conditions","disabilities","emergency_contact_name","emergency_contact_phone",
+  "school_testimonial_url","passport_photographs_url","guardian_id_type","guardian_id_file_url",
+  "class_applying_for","specialized_track","schooling_option","amount_paid","payment_status","payment_reference",
+]);
+
+/** Form field names that differ from the database column names. */
+const ADMISSION_FIELD_ALIASES: Record<string, string> = {
+  dob: "date_of_birth",
+  middle_name: "other_name",
+  lga: "local_government",
+  last_class_passed: "last_class_completed",
+  address: "residential_address",
+};
+
+/** Read merged portal settings (defaults + saved overrides) from server code. */
+async function readSettings() {
+  const { getDb } = await import("./portal.server");
+  const { DEFAULT_SETTINGS } = await import("./settings");
+  const merged = structuredClone(DEFAULT_SETTINGS) as Record<string, Record<string, unknown>>;
+  const { data } = await getDb().from("portal_settings").select("key, value");
+  for (const row of data ?? []) {
+    const key = String(row["key"]);
+    if (merged[key]) Object.assign(merged[key], (row["value"] as object) ?? {});
+  }
+  return merged as unknown as typeof DEFAULT_SETTINGS;
+}
+
+/** Public: the live class catalogue used by the admissions form. */
+export const listClassLevels = createServerFn({ method: "GET" }).handler(async () => {
+  const settings = await readSettings();
+  return {
+    classLevels: settings.academic.classLevels,
+    session: settings.academic.session,
+    term: settings.academic.term,
+  };
+});
+
 export const submitAdmission = createServerFn({ method: "POST" })
   .inputValidator((d: Record<string, unknown>) => d)
   .handler(async ({ data }) => {
     const { getDb, sendEmail, emailShell, adminEmail } = await import("./portal.server");
+    const settings = await readSettings();
+    const classLevel = String(data["class_applying_for"] ?? "").trim();
+    if (!settings.academic.classLevels.includes(classLevel)) {
+      return { ok: false as const, error: "Please choose a class from the school's class catalogue." };
+    }
     const id = refId("JIA-ADM");
-    const row = { ...data, id };
+    const row: Record<string, unknown> = { id, payment_status: "Pending Verification" };
+    for (const [rawKey, value] of Object.entries(data)) {
+      const key = ADMISSION_FIELD_ALIASES[rawKey] ?? rawKey;
+      if (ADMISSION_COLUMNS.has(key)) row[key] = value;
+    }
     const { error } = await getDb().from("admissions").insert(row);
     if (error) return { ok: false as const, error: error.message };
+
+
 
     const name = `${data["first_name"] ?? ""} ${data["surname"] ?? ""}`.trim();
     await sendEmail({
