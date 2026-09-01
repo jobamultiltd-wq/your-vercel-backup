@@ -1,4 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
+
+import { requireCapability } from "@/lib/route-guards";
 import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
 
@@ -6,6 +8,7 @@ import { Input } from "@/components/ui/input";
 import { listStudents } from "@/lib/portal.functions";
 
 export const Route = createFileRoute("/staff/students")({
+  beforeLoad: () => requireCapability("students.view"),
   head: () => ({
     meta: [
       { title: "Student Register — Joba International Academy" },
