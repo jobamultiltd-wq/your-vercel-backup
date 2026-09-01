@@ -509,8 +509,9 @@ export const saveExamScore = createServerFn({ method: "POST" })
       grade,
       updated_at: new Date().toISOString(),
     };
-
+    const { error } = existing
       ? await db.from("exam_scores").update(payload).eq("id", existing["id"])
+
       : await db.from("exam_scores").insert(payload);
     if (error) return { ok: false as const, error: error.message };
     return { ok: true as const, total, grade };
