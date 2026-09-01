@@ -1,31 +1,53 @@
 import { Link } from "@tanstack/react-router";
+import { useQuery } from "@tanstack/react-query";
 import type { ReactNode } from "react";
 
 import logoAsset from "@/assets/logo.png.asset.json";
+import { getPortalSettings } from "@/lib/portal.functions";
+import { DEFAULT_SETTINGS } from "@/lib/settings";
 
-const NAV = [
-  { to: "/", label: "Home" },
-  { to: "/admissions", label: "Admissions" },
-  { to: "/holiday-coaching", label: "Holiday Coaching" },
-  { to: "/careers", label: "Careers" },
-  { to: "/track", label: "Track Application" },
-] as const;
+export function useSiteSettings() {
+  const { data } = useQuery({
+    queryKey: ["portal-settings"],
+    queryFn: () => getPortalSettings(),
+    staleTime: 60_000,
+  });
+  return data?.settings ?? DEFAULT_SETTINGS;
+}
 
 export function SiteHeader() {
+  const settings = useSiteSettings();
+  const nav = [
+    { to: "/", label: "Home", show: true },
+    { to: "/admissions", label: "Admissions", show: settings.portal.admissionsOpen },
+    { to: "/holiday-coaching", label: "Holiday Coaching", show: settings.portal.coachingOpen },
+    { to: "/careers", label: "Careers", show: settings.portal.careersOpen },
+    { to: "/track", label: "Track Application", show: true },
+  ].filter((i) => i.show);
+
   return (
     <header className="sticky top-0 z-40 border-b border-border bg-primary text-primary-foreground">
+      {settings.portal.announcement ? (
+        <p className="bg-accent px-4 py-1.5 text-center text-xs font-medium text-accent-foreground">
+          {settings.portal.announcement}
+        </p>
+      ) : null}
       <div className="mx-auto flex max-w-6xl flex-wrap items-center gap-3 px-4 py-3">
         <Link to="/" className="flex items-center gap-3">
-          <img src={logoAsset.url} alt="Joba International Academy crest" className="h-11 w-11" />
+          <img
+            src={settings.school.logoUrl || logoAsset.url}
+            alt={`${settings.school.name} crest`}
+            className="h-11 w-11"
+          />
           <span className="leading-tight">
-            <span className="block font-display text-lg font-bold">Joba International Academy</span>
+            <span className="block font-display text-lg font-bold">{settings.school.name}</span>
             <span className="block text-[10px] tracking-[0.25em] text-accent">
-              VIRTUTE ET DEVOTIONE
+              {settings.school.motto.split("(")[0]?.trim().toUpperCase()}
             </span>
           </span>
         </Link>
         <nav className="ml-auto flex flex-wrap items-center gap-1 text-sm">
-          {NAV.map((item) => (
+          {nav.map((item) => (
             <Link
               key={item.to}
               to={item.to}
@@ -48,20 +70,26 @@ export function SiteHeader() {
 }
 
 export function SiteFooter() {
+  const settings = useSiteSettings();
   return (
     <footer className="mt-16 border-t border-border bg-primary py-8 text-primary-foreground">
       <div className="mx-auto max-w-6xl px-4 text-sm">
-        <p className="font-display text-base font-semibold">Joba International Academy</p>
+        <p className="font-display text-base font-semibold">{settings.school.name}</p>
         <p className="mt-1 text-primary-foreground/70">
-          academy@jobamultiltd.com · Directorate of Academic Affairs
+          {settings.school.address}
+        </p>
+        <p className="mt-1 text-primary-foreground/70">
+          {settings.school.email} · {settings.school.phone}
         </p>
         <p className="mt-4 text-xs text-primary-foreground/50">
-          © {new Date().getFullYear()} Joba International Academy. All rights reserved.
+          © {new Date().getFullYear()} {settings.school.name}. Session{" "}
+          {settings.academic.session} · {settings.academic.term}. All rights reserved.
         </p>
       </div>
     </footer>
   );
 }
+
 
 export function PublicPage({ children }: { children: ReactNode }) {
   return (
