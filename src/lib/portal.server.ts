@@ -64,16 +64,65 @@ export async function requireAdmin(): Promise<PortalSession> {
   return { ...user, id: String(data["id"]) };
 }
 
-/** Passwords in the legacy database are stored either in plain text or as sha256 hex. */
-export async function passwordMatches(input: string, stored: string | null) {
-  if (!stored) return false;
-  if (input === stored) return true;
-  const digest = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(input));
-  const hex = Array.from(new Uint8Array(digest))
+const PBKDF2_ITERATIONS = 100_000;
+
+function toHex(bytes: Uint8Array) {
+  return Array.from(bytes)
     .map((b) => b.toString(16).padStart(2, "0"))
     .join("");
-  return hex === stored.trim().toLowerCase();
 }
+
+async function sha256Hex(input: string) {
+  const digest = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(input));
+  return toHex(new Uint8Array(digest));
+}
+
+async function pbkdf2Hex(input: string, saltHex: string, iterations: number) {
+  const salt = new Uint8Array((saltHex.match(/.{2}/g) ?? []).map((h) => parseInt(h, 16)));
+  const key = await crypto.subtle.importKey("raw", new TextEncoder().encode(input), "PBKDF2", false, [
+    "deriveBits",
+  ]);
+  const bits = await crypto.subtle.deriveBits(
+    { name: "PBKDF2", salt, iterations, hash: "SHA-256" },
+    key,
+    256,
+  );
+  return toHex(new Uint8Array(bits));
+}
+
+/** Hash a password for storage: pbkdf2$iterations$salt$digest. */
+export async function hashPassword(input: string) {
+  const salt = toHex(crypto.getRandomValues(new Uint8Array(16)));
+  const digest = await pbkdf2Hex(input, salt, PBKDF2_ITERATIONS);
+  return `pbkdf2$${PBKDF2_ITERATIONS}$${salt}$${digest}`;
+}
+
+/**
+ * Verify a password. Supports the modern pbkdf2 format plus the legacy database
+ * values (plain text or sha256 hex) so existing accounts keep working.
+ */
+export async function passwordMatches(input: string, stored: string | null) {
+  if (!stored) return false;
+  const value = stored.trim();
+  if (value.startsWith("pbkdf2$")) {
+    const [, iterRaw, salt, digest] = value.split("$");
+    if (!iterRaw || !salt || !digest) return false;
+    return (await pbkdf2Hex(input, salt, Number(iterRaw))) === digest;
+  }
+  if (input === value) return true;
+  return (await sha256Hex(input)) === value.toLowerCase();
+}
+
+/** True when a stored value still uses a legacy (plain/sha256) format. */
+export function isLegacyHash(stored: string | null) {
+  return !!stored && !stored.trim().startsWith("pbkdf2$");
+}
+
+/** Escape a user-supplied value for use inside a PostgREST `or()` filter. */
+export function sanitizeFilterValue(value: string) {
+  return value.replace(/[,()"'\\]/g, "").trim();
+}
+
 
 /** Upload a base64 data URL to Cloudinary using a signed request. */
 export async function uploadToCloudinary(dataUrl: string, folder: string) {
