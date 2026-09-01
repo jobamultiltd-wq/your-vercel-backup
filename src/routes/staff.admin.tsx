@@ -414,6 +414,46 @@ function StaffManager({
         <p className="text-sm text-muted-foreground">{staff.length} staff accounts</p>
       </div>
 
+      <div className="rounded-lg border border-border bg-card p-5">
+        <p className="font-display text-lg font-semibold">What each role can do</p>
+        <p className="mt-1 text-sm text-muted-foreground">
+          Access is granted by role — assign the right role and the staff member sees only those
+          pages. Changes apply the next time they load the portal.
+        </p>
+        <div className="mt-4 overflow-x-auto">
+          <table className="min-w-[640px] w-full text-sm">
+            <thead>
+              <tr className="border-b border-border text-left text-xs uppercase text-muted-foreground">
+                <th className="py-2 pr-3">Capability</th>
+                {STAFF_ROLES.map((r) => (
+                  <th key={r} className="px-2 py-2">
+                    {r.replace("_", " ")}
+                  </th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {CAPABILITIES.map((cap) => (
+                <tr key={cap} className="border-b border-border/60">
+                  <td className="py-2 pr-3">{CAPABILITY_LABELS[cap]}</td>
+                  {STAFF_ROLES.map((r) => (
+                    <td key={r} className="px-2 py-2 text-center">
+                      {can(r, cap) ? (
+                        <span className="text-accent">✓</span>
+                      ) : (
+                        <span className="text-muted-foreground/40">—</span>
+                      )}
+                    </td>
+                  ))}
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+
+
       {editing ? (
         <form
           className="grid max-w-3xl gap-4 rounded-lg border border-border bg-card p-5 md:grid-cols-2"
