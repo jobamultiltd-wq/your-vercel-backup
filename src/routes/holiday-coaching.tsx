@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { toast } from "sonner";
 
-import { PageHeading, PublicPage } from "@/components/site-chrome";
+import { PageHeading, PublicPage, useSiteSettings } from "@/components/site-chrome";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -29,6 +29,22 @@ export const Route = createFileRoute("/holiday-coaching")({
 });
 
 function HolidayPage() {
+  const siteSettings = useSiteSettings();
+  if (!siteSettings.portal.coachingOpen) {
+    return (
+      <PublicPage>
+        <PageHeading title="Holiday coaching registration is closed" />
+        <div className="mx-auto max-w-3xl px-4 py-12">
+          <p className="text-muted-foreground">Registration for vacation classes is not open at the moment.</p>
+        </div>
+      </PublicPage>
+    );
+  }
+  return <HolidayPageForm />;
+}
+
+function HolidayPageForm() {
+
   const [busy, setBusy] = useState(false);
   const [done, setDone] = useState<string | null>(null);
 

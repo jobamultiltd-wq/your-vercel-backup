@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { toast } from "sonner";
 
-import { PageHeading, PublicPage } from "@/components/site-chrome";
+import { PageHeading, PublicPage, useSiteSettings } from "@/components/site-chrome";
 import { UploadField } from "@/components/upload-field";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -79,6 +79,22 @@ function Field({
 }
 
 function AdmissionsPage() {
+  const siteSettings = useSiteSettings();
+  if (!siteSettings.portal.admissionsOpen) {
+    return (
+      <PublicPage>
+        <PageHeading title="Admissions are currently closed" />
+        <div className="mx-auto max-w-3xl px-4 py-12">
+          <p className="text-muted-foreground">Online admission applications are not being accepted at the moment. Please check back soon or contact the Directorate of Academic Affairs.</p>
+        </div>
+      </PublicPage>
+    );
+  }
+  return <AdmissionsPageForm />;
+}
+
+function AdmissionsPageForm() {
+
   const [busy, setBusy] = useState(false);
   const [reference, setReference] = useState<string | null>(null);
   const [docs, setDocs] = useState<Record<string, string>>({});

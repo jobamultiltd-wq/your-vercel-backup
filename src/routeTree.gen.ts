@@ -18,6 +18,7 @@ import { Route as StaffRouteImport } from './routes/staff'
 import { Route as StudentRouteImport } from './routes/student'
 import { Route as TrackRouteImport } from './routes/track'
 import { Route as StaffIndexRouteImport } from './routes/staff.index'
+import { Route as StaffAdminRouteImport } from './routes/staff.admin'
 import { Route as StaffAdmissionsRouteImport } from './routes/staff.admissions'
 import { Route as StaffAssignmentsRouteImport } from './routes/staff.assignments'
 import { Route as StaffAttendanceRouteImport } from './routes/staff.attendance'
@@ -74,6 +75,11 @@ const TrackRoute = TrackRouteImport.update({
 const StaffIndexRoute = StaffIndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => StaffRoute,
+} as any)
+const StaffAdminRoute = StaffAdminRouteImport.update({
+  id: '/admin',
+  path: '/admin',
   getParentRoute: () => StaffRoute,
 } as any)
 const StaffAdmissionsRoute = StaffAdmissionsRouteImport.update({
@@ -146,6 +152,7 @@ export interface FileRoutesByFullPath {
   '/staff': typeof StaffRouteWithChildren
   '/student': typeof StudentRouteWithChildren
   '/track': typeof TrackRoute
+  '/staff/admin': typeof StaffAdminRoute
   '/staff/admissions': typeof StaffAdmissionsRoute
   '/staff/assignments': typeof StaffAssignmentsRoute
   '/staff/attendance': typeof StaffAttendanceRoute
@@ -167,6 +174,7 @@ export interface FileRoutesByTo {
   '/holiday-coaching': typeof HolidayCoachingRoute
   '/login': typeof LoginRoute
   '/track': typeof TrackRoute
+  '/staff/admin': typeof StaffAdminRoute
   '/staff/admissions': typeof StaffAdmissionsRoute
   '/staff/assignments': typeof StaffAssignmentsRoute
   '/staff/attendance': typeof StaffAttendanceRoute
@@ -191,6 +199,7 @@ export interface FileRoutesById {
   '/staff': typeof StaffRouteWithChildren
   '/student': typeof StudentRouteWithChildren
   '/track': typeof TrackRoute
+  '/staff/admin': typeof StaffAdminRoute
   '/staff/admissions': typeof StaffAdmissionsRoute
   '/staff/assignments': typeof StaffAssignmentsRoute
   '/staff/attendance': typeof StaffAttendanceRoute
@@ -216,6 +225,7 @@ export interface FileRouteTypes {
     | '/staff'
     | '/student'
     | '/track'
+    | '/staff/admin'
     | '/staff/admissions'
     | '/staff/assignments'
     | '/staff/attendance'
@@ -237,6 +247,7 @@ export interface FileRouteTypes {
     | '/holiday-coaching'
     | '/login'
     | '/track'
+    | '/staff/admin'
     | '/staff/admissions'
     | '/staff/assignments'
     | '/staff/attendance'
@@ -260,6 +271,7 @@ export interface FileRouteTypes {
     | '/staff'
     | '/student'
     | '/track'
+    | '/staff/admin'
     | '/staff/admissions'
     | '/staff/assignments'
     | '/staff/attendance'
@@ -351,6 +363,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof StaffIndexRouteImport
       parentRoute: typeof StaffRoute
     }
+    '/staff/admin': {
+      id: '/staff/admin'
+      path: '/admin'
+      fullPath: '/staff/admin'
+      preLoaderRoute: typeof StaffAdminRouteImport
+      parentRoute: typeof StaffRoute
+    }
     '/staff/admissions': {
       id: '/staff/admissions'
       path: '/admissions'
@@ -439,6 +458,7 @@ declare module '@tanstack/react-router' {
 }
 
 interface StaffRouteChildren {
+  StaffAdminRoute: typeof StaffAdminRoute
   StaffAdmissionsRoute: typeof StaffAdmissionsRoute
   StaffAssignmentsRoute: typeof StaffAssignmentsRoute
   StaffAttendanceRoute: typeof StaffAttendanceRoute
@@ -450,6 +470,7 @@ interface StaffRouteChildren {
 }
 
 const StaffRouteChildren: StaffRouteChildren = {
+  StaffAdminRoute: StaffAdminRoute,
   StaffAdmissionsRoute: StaffAdmissionsRoute,
   StaffAssignmentsRoute: StaffAssignmentsRoute,
   StaffAttendanceRoute: StaffAttendanceRoute,

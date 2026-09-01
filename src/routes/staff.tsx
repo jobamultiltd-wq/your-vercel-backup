@@ -15,6 +15,8 @@ const NAV = [
   { to: "/staff/fees", label: "Fees" },
 ];
 
+const ADMIN_NAV = { to: "/staff/admin", label: "Administration" };
+
 export const Route = createFileRoute("/staff")({
   ssr: false,
   beforeLoad: async () => {
@@ -27,8 +29,10 @@ export const Route = createFileRoute("/staff")({
 
 function StaffLayout() {
   const { data: user } = usePortalSession();
+  const role = (user?.staffRole ?? "").toLowerCase();
+  const nav = role === "admin" || role === "principal" ? [...NAV, ADMIN_NAV] : NAV;
   return (
-    <PortalShell user={user ?? null} nav={NAV}>
+    <PortalShell user={user ?? null} nav={nav}>
       <Outlet />
     </PortalShell>
   );

@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 
 import { Button } from "@/components/ui/button";
-import { studentResults } from "@/lib/portal.functions";
+import { getPortalSettings, studentResults } from "@/lib/portal.functions";
 import { buildOfficialReportCardPDF } from "@/lib/reportCardPdfGenerator";
 
 export const Route = createFileRoute("/student/results")({
@@ -22,8 +22,26 @@ function ResultsPage() {
     queryKey: ["student-results"],
     queryFn: () => studentResults(),
   });
+  const { data: settings } = useQuery({
+    queryKey: ["portal-settings"],
+    queryFn: () => getPortalSettings(),
+    staleTime: 60_000,
+  });
 
   if (isLoading || !data) return <p className="text-muted-foreground">Loading results…</p>;
+
+  if (settings && !settings.settings.portal.resultsPublished) {
+    return (
+      <div className="rounded-lg border border-border bg-card p-6">
+        <h1 className="font-display text-2xl font-bold">Results</h1>
+        <p className="mt-2 text-muted-foreground">
+          Results for this term have not been released yet. Please check back after the school
+          publishes them.
+        </p>
+      </div>
+    );
+  }
+
 
   const scores = data.scores;
   const report = (data.reports[0] ?? {}) as Record<string, unknown>;
