@@ -437,42 +437,78 @@ export const listStudents = createServerFn({ method: "GET" }).handler(async () =
   return data ?? [];
 });
 
+export const ADMISSION_STATUSES = [
+  "Pending Verification",
+  "Paid",
+  "Under Review",
+  "Approved",
+  "Rejected",
+  "Enrolled",
+] as const;
+
 export const listAdmissions = createServerFn({ method: "GET" }).handler(async () => {
-  const { getDb, requireStaff, requirePermission } = await import("./portal.server");
+  const { getDb, requirePermission } = await import("./portal.server");
   await requirePermission("admissions.review");
-  const { data } = await getDb()
-    .from("admissions")
-    .select("*")
-    .order("created_at", { ascending: false });
-  return data ?? [];
+  const db = getDb();
+  const [{ data }, { data: profiles }] = await Promise.all([
+    db.from("admissions").select("*").order("created_at", { ascending: false }),
+    db.from("student_profiles").select("admission_id, student_email, class_level"),
+  ]);
+  const byId = new Map((profiles ?? []).map((p) => [String(p["admission_id"]), p]));
+  const settings = await readSettings();
+  return {
+    classLevels: settings.academic.classLevels,
+    session: settings.academic.session,
+    rows: (data ?? []).map((a) => {
+      const profile = byId.get(String(a["id"]));
+      return {
+        ...a,
+        enrolled: Boolean(profile),
+        student_email: profile ? String(profile["student_email"] ?? "") : "",
+        enrolled_class: profile ? String(profile["class_level"] ?? "") : "",
+      };
+    }),
+  };
 });
 
 export const updateAdmission = createServerFn({ method: "POST" })
-  .inputValidator((d: { id: string; application_status: string; notify?: boolean }) => d)
+  .inputValidator((d: { id: string; application_status: string; class_applying_for?: string; notify?: boolean }) => d)
   .handler(async ({ data }) => {
-    const { getDb, requireStaff, requirePermission, sendEmail, emailShell } = await import("./portal.server");
+    const { getDb, requirePermission, sendEmail, emailShell } = await import("./portal.server");
     await requirePermission("admissions.review");
     const db = getDb();
+    const patch: Record<string, unknown> = {
+      payment_status: data.application_status,
+      updated_at: new Date().toISOString(),
+    };
+    if (data.class_applying_for) patch["class_applying_for"] = data.class_applying_for;
     const { data: row, error } = await db
       .from("admissions")
-      .update({
-        payment_status: data.application_status,
-        updated_at: new Date().toISOString(),
-      })
+      .update(patch)
       .eq("id", data.id)
       .select()
       .maybeSingle();
     if (error) return { ok: false as const, error: error.message };
 
     if (data.notify && row) {
+      const approved = data.application_status === "Approved";
       await sendEmail({
         to: String(row["guardian_email"]),
-        subject: `Admission update — ${row["id"]}`,
+        subject: approved
+          ? `Admission approved — ${row["id"]}`
+          : `Admission update — ${row["id"]}`,
         html: emailShell(
-          "Admission Status Update",
+          approved ? "Admission Approved" : "Admission Status Update",
           `<p>Dear ${row["guardian_name"]},</p>
            <p>The application for <strong>${row["first_name"]} ${row["surname"]}</strong> is now
-           <strong>${data.application_status}</strong>.</p>`,
+           <strong>${data.application_status}</strong>${
+             approved ? ` for placement in <strong>${row["class_applying_for"]}</strong>` : ""
+           }.</p>
+           ${
+             approved
+               ? `<p>The student portal account and login details will be sent in a separate enrolment confirmation email.</p>`
+               : ""
+           }`,
         ),
       });
     }
@@ -480,11 +516,13 @@ export const updateAdmission = createServerFn({ method: "POST" })
   });
 
 export const enrollStudent = createServerFn({ method: "POST" })
-  .inputValidator((d: { admissionId: string }) => d)
+  .inputValidator((d: { admissionId: string; classLevel?: string }) => d)
   .handler(async ({ data }) => {
-    const { getDb, requireStaff, requirePermission, sendEmail, emailShell } = await import("./portal.server");
+    const { getDb, requirePermission, sendEmail, emailShell, adminEmail, hashPassword } =
+      await import("./portal.server");
     await requirePermission("admissions.enrol");
     const db = getDb();
+    const settings = await readSettings();
     const { data: adm } = await db
       .from("admissions")
       .select("*")
@@ -492,9 +530,42 @@ export const enrollStudent = createServerFn({ method: "POST" })
       .maybeSingle();
     if (!adm) return { ok: false as const, error: "Admission not found." };
 
+    const status = String(adm["payment_status"] ?? "");
+    if (status !== "Approved" && status !== "Enrolled") {
+      return {
+        ok: false as const,
+        error: "Approve the application before generating a student account.",
+      };
+    }
+
+    const classLevel = String(data.classLevel ?? adm["class_applying_for"] ?? "").trim();
+    if (!settings.academic.classLevels.includes(classLevel)) {
+      return { ok: false as const, error: "Set a class from the class catalogue before enrolling." };
+    }
+
+    const { data: existing } = await db
+      .from("student_profiles")
+      .select("admission_id, student_email")
+      .eq("admission_id", adm["id"])
+      .maybeSingle();
+
+    /* Unique student email within the school domain. */
+    const slug = (v: unknown) =>
+      String(v ?? "")
+        .toLowerCase()
+        .replace(/[^a-z]/g, "");
+    const base = `${slug(adm["first_name"])}.${slug(adm["surname"])}`;
+    let email = existing ? String(existing["student_email"]) : `${base}@student.jobamultiltd.com`;
+    if (!existing) {
+      const { data: clash } = await db
+        .from("student_profiles")
+        .select("admission_id")
+        .eq("student_email", email)
+        .maybeSingle();
+      if (clash) email = `${base}.${String(adm["id"]).slice(-4).toLowerCase()}@student.jobamultiltd.com`;
+    }
+
     const password = `JIA${Math.random().toString(36).slice(2, 8).toUpperCase()}`;
-    const { hashPassword } = await import("./portal.server");
-    const email = `${String(adm["first_name"]).toLowerCase()}.${String(adm["surname"]).toLowerCase()}@student.jobamultiltd.com`;
     const { error } = await db.from("student_profiles").upsert(
       {
         admission_id: adm["id"],
@@ -502,7 +573,7 @@ export const enrollStudent = createServerFn({ method: "POST" })
         guardian_email: adm["guardian_email"],
         first_name: adm["first_name"],
         last_name: adm["surname"],
-        class_level: adm["class_applying_for"],
+        class_level: classLevel,
         specialized_track: adm["specialized_track"],
         schooling_option: adm["schooling_option"],
         portal_password_hash: await hashPassword(password),
@@ -512,20 +583,47 @@ export const enrollStudent = createServerFn({ method: "POST" })
     );
     if (error) return { ok: false as const, error: error.message };
 
+    await db
+      .from("admissions")
+      .update({
+        payment_status: "Enrolled",
+        class_applying_for: classLevel,
+        updated_at: new Date().toISOString(),
+      })
+      .eq("id", adm["id"]);
+
+    const studentName = `${adm["first_name"]} ${adm["surname"]}`;
     await sendEmail({
       to: [String(adm["guardian_email"])],
-      subject: "Student portal credentials",
+      subject: `Enrolment confirmed — ${studentName} (${adm["id"]})`,
       html: emailShell(
-        "Portal Access Created",
+        "Enrolment Confirmation",
         `<p>Dear ${adm["guardian_name"]},</p>
-         <p>The student portal account for <strong>${adm["first_name"]} ${adm["surname"]}</strong> is ready.</p>
-         <p>Admission ID: <strong>${adm["id"]}</strong><br/>
-         Student email: <strong>${email}</strong><br/>
-         Temporary password: <strong>${password}</strong></p>`,
+         <p>We are pleased to confirm that <strong>${studentName}</strong> has been enrolled at
+         ${settings.school.name} for the <strong>${settings.academic.session}</strong> academic session.</p>
+         <p>Class: <strong>${classLevel}</strong><br/>
+         Schooling option: <strong>${adm["schooling_option"] ?? "Day Schooling"}</strong><br/>
+         Admission ID: <strong>${adm["id"]}</strong></p>
+         <p>The student portal account is ready:</p>
+         <p>Student email: <strong>${email}</strong><br/>
+         Temporary password: <strong>${password}</strong></p>
+         <p>Please sign in and change the password on first login. Resumption${
+           settings.academic.resumptionDate ? ` is on ${settings.academic.resumptionDate}` : " details follow shortly"
+         }.</p>`,
       ),
     });
-    return { ok: true as const, email, password };
+    await sendEmail({
+      to: adminEmail(),
+      subject: `Student enrolled — ${studentName} (${classLevel})`,
+      html: emailShell(
+        "New Enrolment",
+        `<p><strong>${studentName}</strong> (${adm["id"]}) was enrolled into <strong>${classLevel}</strong>
+         for ${settings.academic.session}. Portal login: ${email}</p>`,
+      ),
+    });
+    return { ok: true as const, email, password, classLevel };
   });
+
 
 export const saveExamScore = createServerFn({ method: "POST" })
   .inputValidator(
