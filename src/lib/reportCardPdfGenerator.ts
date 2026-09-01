@@ -7,10 +7,12 @@ export interface ReportCardSubject {
   exam: number;
   total: number;
   grade: string;
-  position?: string;
-  highest?: number;
-  lowest?: number;
-  average?: number;
+  position?: string | undefined;
+  highest?: number | undefined;
+  lowest?: number | undefined;
+  average?: number | undefined;
+  remark?: string | undefined;
+
 }
 
 export interface ReportCardData {

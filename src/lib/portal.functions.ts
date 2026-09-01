@@ -138,8 +138,9 @@ export const trackApplication = createServerFn({ method: "POST" })
     const { data: row } = await getDb()
       .from("admissions")
       .select(
-        "id, first_name, surname, class_applying_for, application_status, payment_status, status, created_at",
+        "id, first_name, surname, class_applying_for, payment_status, payment_reference, created_at",
       )
+
       .eq("id", data.reference.trim())
       .maybeSingle();
     return row ?? null;
@@ -207,10 +208,10 @@ export const submitAssignment = createServerFn({ method: "POST" })
       admission_id: user.id!,
       assignment_id: data.assignmentId,
       status: "Submitted",
-      submission_text: data.text,
-      submission_url: data.fileUrl ?? null,
+      feedback: data.text ? `Student note: ${data.text}` : null,
       submitted_at: new Date().toISOString(),
     };
+
     const { error } = existing
       ? await db.from("student_assignments").update(payload).eq("id", existing["id"])
       : await db.from("student_assignments").insert(payload);
@@ -258,19 +259,25 @@ export const studentResults = createServerFn({ method: "GET" }).handler(async ()
   const { getDb, requireStudent } = await import("./portal.server");
   const user = await requireStudent();
   const db = getDb();
-  const [scores, reports, profile, attendance] = await Promise.all([
+  const [scores, reports, profile, attendance, admission] = await Promise.all([
     db.from("exam_scores").select("*").eq("admission_id", user.id!).order("subject"),
     db.from("student_term_reports").select("*").eq("admission_id", user.id!),
     db.from("student_profiles").select("*").eq("admission_id", user.id!).maybeSingle(),
     db.from("attendance_records").select("*").eq("admission_id", user.id!),
+    db
+      .from("admissions")
+      .select("gender, age, date_of_birth")
+      .eq("id", user.id!)
+      .maybeSingle(),
   ]);
   return {
     scores: scores.data ?? [],
     reports: reports.data ?? [],
-    profile: profile.data,
+    profile: profile.data ? { ...profile.data, ...(admission.data ?? {}) } : admission.data,
     attendance: attendance.data ?? [],
   };
 });
+
 
 /* ------------------------------------------------------------------ */
 /* Staff portal                                                        */
@@ -394,8 +401,7 @@ export const updateAdmission = createServerFn({ method: "POST" })
     const { data: row, error } = await db
       .from("admissions")
       .update({
-        application_status: data.application_status,
-        status: data.application_status,
+        payment_status: data.application_status,
         updated_at: new Date().toISOString(),
       })
       .eq("id", data.id)
@@ -438,14 +444,12 @@ export const enrollStudent = createServerFn({ method: "POST" })
         admission_id: adm["id"],
         student_email: email,
         guardian_email: adm["guardian_email"],
-        guardian_phone: adm["guardian_phone"],
         first_name: adm["first_name"],
         last_name: adm["surname"],
         class_level: adm["class_applying_for"],
         specialized_track: adm["specialized_track"],
         schooling_option: adm["schooling_option"],
         portal_password_hash: password,
-        is_activated: true,
         updated_at: new Date().toISOString(),
       },
       { onConflict: "admission_id" },
@@ -494,9 +498,24 @@ export const saveExamScore = createServerFn({ method: "POST" })
       .eq("term", data.term)
       .eq("session", data.session)
       .maybeSingle();
-    const payload = { ...data, score: total, total, grade, updated_at: new Date().toISOString() };
+    const { admission_id, subject, term, session } = data;
+    const payload = {
+      admission_id,
+      subject,
+      term,
+      session,
+      exam_type: "Terminal Exam",
+      ca1_score: Number(data.ca1),
+      ca2_score: Number(data.ca2),
+      exam_score: Number(data.exam),
+      total_score: total,
+      score: total,
+      grade,
+      updated_at: new Date().toISOString(),
+    };
     const { error } = existing
       ? await db.from("exam_scores").update(payload).eq("id", existing["id"])
+
       : await db.from("exam_scores").insert(payload);
     if (error) return { ok: false as const, error: error.message };
     return { ok: true as const, total, grade };
