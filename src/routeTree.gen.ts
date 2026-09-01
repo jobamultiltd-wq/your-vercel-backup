@@ -27,6 +27,7 @@ import { Route as StaffAdminRouteImport } from './routes/staff.admin'
 import { Route as StaffAdmissionsRouteImport } from './routes/staff.admissions'
 import { Route as StaffAssignmentsRouteImport } from './routes/staff.assignments'
 import { Route as StaffAttendanceRouteImport } from './routes/staff.attendance'
+import { Route as StaffClassesRouteImport } from './routes/staff.classes'
 import { Route as StaffFeesRouteImport } from './routes/staff.fees'
 import { Route as StaffNoticesRouteImport } from './routes/staff.notices'
 import { Route as StaffNotificationsRouteImport } from './routes/staff.notifications'
@@ -129,6 +130,11 @@ const StaffAttendanceRoute = StaffAttendanceRouteImport.update({
   path: '/attendance',
   getParentRoute: () => StaffRoute,
 } as any)
+const StaffClassesRoute = StaffClassesRouteImport.update({
+  id: '/classes',
+  path: '/classes',
+  getParentRoute: () => StaffRoute,
+} as any)
 const StaffFeesRoute = StaffFeesRouteImport.update({
   id: '/fees',
   path: '/fees',
@@ -202,6 +208,7 @@ export interface FileRoutesByFullPath {
   '/staff/admissions': typeof StaffAdmissionsRoute
   '/staff/assignments': typeof StaffAssignmentsRoute
   '/staff/attendance': typeof StaffAttendanceRoute
+  '/staff/classes': typeof StaffClassesRoute
   '/staff/fees': typeof StaffFeesRoute
   '/staff/notices': typeof StaffNoticesRoute
   '/staff/notifications': typeof StaffNotificationsRoute
@@ -230,6 +237,7 @@ export interface FileRoutesByTo {
   '/staff/admissions': typeof StaffAdmissionsRoute
   '/staff/assignments': typeof StaffAssignmentsRoute
   '/staff/attendance': typeof StaffAttendanceRoute
+  '/staff/classes': typeof StaffClassesRoute
   '/staff/fees': typeof StaffFeesRoute
   '/staff/notices': typeof StaffNoticesRoute
   '/staff/notifications': typeof StaffNotificationsRoute
@@ -262,6 +270,7 @@ export interface FileRoutesById {
   '/staff/admissions': typeof StaffAdmissionsRoute
   '/staff/assignments': typeof StaffAssignmentsRoute
   '/staff/attendance': typeof StaffAttendanceRoute
+  '/staff/classes': typeof StaffClassesRoute
   '/staff/fees': typeof StaffFeesRoute
   '/staff/notices': typeof StaffNoticesRoute
   '/staff/notifications': typeof StaffNotificationsRoute
@@ -295,6 +304,7 @@ export interface FileRouteTypes {
     | '/staff/admissions'
     | '/staff/assignments'
     | '/staff/attendance'
+    | '/staff/classes'
     | '/staff/fees'
     | '/staff/notices'
     | '/staff/notifications'
@@ -323,6 +333,7 @@ export interface FileRouteTypes {
     | '/staff/admissions'
     | '/staff/assignments'
     | '/staff/attendance'
+    | '/staff/classes'
     | '/staff/fees'
     | '/staff/notices'
     | '/staff/notifications'
@@ -354,6 +365,7 @@ export interface FileRouteTypes {
     | '/staff/admissions'
     | '/staff/assignments'
     | '/staff/attendance'
+    | '/staff/classes'
     | '/staff/fees'
     | '/staff/notices'
     | '/staff/notifications'
@@ -509,6 +521,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof StaffAttendanceRouteImport
       parentRoute: typeof StaffRoute
     }
+    '/staff/classes': {
+      id: '/staff/classes'
+      path: '/classes'
+      fullPath: '/staff/classes'
+      preLoaderRoute: typeof StaffClassesRouteImport
+      parentRoute: typeof StaffRoute
+    }
     '/staff/fees': {
       id: '/staff/fees'
       path: '/fees'
@@ -610,6 +629,7 @@ interface StaffRouteChildren {
   StaffAdmissionsRoute: typeof StaffAdmissionsRoute
   StaffAssignmentsRoute: typeof StaffAssignmentsRoute
   StaffAttendanceRoute: typeof StaffAttendanceRoute
+  StaffClassesRoute: typeof StaffClassesRoute
   StaffFeesRoute: typeof StaffFeesRoute
   StaffNoticesRoute: typeof StaffNoticesRoute
   StaffNotificationsRoute: typeof StaffNotificationsRoute
@@ -624,6 +644,7 @@ const StaffRouteChildren: StaffRouteChildren = {
   StaffAdmissionsRoute: StaffAdmissionsRoute,
   StaffAssignmentsRoute: StaffAssignmentsRoute,
   StaffAttendanceRoute: StaffAttendanceRoute,
+  StaffClassesRoute: StaffClassesRoute,
   StaffFeesRoute: StaffFeesRoute,
   StaffNoticesRoute: StaffNoticesRoute,
   StaffNotificationsRoute: StaffNotificationsRoute,
