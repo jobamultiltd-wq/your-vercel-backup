@@ -34,7 +34,7 @@ function AssignmentsPage() {
 
   return (
     <div className="space-y-6">
-      <h1 className="font-display text-3xl font-bold">Assignments</h1>
+      <h1 className="font-display text-2xl font-bold sm:text-3xl">Assignments</h1>
 
       {data.available.length === 0 ? (
         <p className="text-muted-foreground">No assignments have been published for your class.</p>

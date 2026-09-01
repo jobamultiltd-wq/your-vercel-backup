@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { PageHeader } from "@/components/portal-shell";
 import { usePortalSession } from "@/hooks/use-portal-session";
 import { listSubjects, saveSubjectRegistration, studentOverview } from "@/lib/portal.functions";
 
@@ -47,12 +48,16 @@ function SubjectsPage() {
 
   return (
     <div className="space-y-6">
-      <header>
-        <h1 className="font-display text-3xl font-bold">Subject Registration</h1>
-        <p className="text-muted-foreground">
-          {section} catalogue for {user?.classLevel ?? "your class"}.
+      <PageHeader
+        title="Subject Registration"
+        subtitle={`${section} catalogue for ${user?.classLevel ?? "your class"}.`}
+      />
+
+      {!subjects.isLoading && list.length === 0 ? (
+        <p className="rounded-lg border border-border bg-card p-4 text-sm text-muted-foreground">
+          No subject catalogue has been published for {section} yet. Please check back later.
         </p>
-      </header>
+      ) : null}
 
       <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
         {list.map((s) => {
@@ -61,7 +66,7 @@ function SubjectsPage() {
           return (
             <label
               key={String(s["id"])}
-              className="flex items-start gap-3 rounded-lg border border-border bg-card p-3"
+              className="flex min-w-0 items-start gap-3 rounded-lg border border-border bg-card p-3"
             >
               <Checkbox
                 checked={checked}
@@ -69,8 +74,8 @@ function SubjectsPage() {
                   setSelected((prev) => (v ? [...prev, name] : prev.filter((p) => p !== name)))
                 }
               />
-              <span>
-                <span className="block text-sm font-medium">{name}</span>
+              <span className="min-w-0">
+                <span className="block break-words text-sm font-medium">{name}</span>
                 <span className="text-xs text-muted-foreground">{String(s["category"])}</span>
               </span>
             </label>
@@ -106,6 +111,7 @@ function SubjectsPage() {
       </div>
 
       <Button
+        className="w-full sm:w-auto"
         disabled={busy || selected.length === 0}
         onClick={async () => {
           setBusy(true);

@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 
+import { PageHeader } from "@/components/portal-shell";
 import { Button } from "@/components/ui/button";
 import { getPortalSettings, studentResults } from "@/lib/portal.functions";
 import { buildOfficialReportCardPDF } from "@/lib/reportCardPdfGenerator";
@@ -99,16 +100,66 @@ function ResultsPage() {
 
 
   return (
-    <div className="space-y-6">
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <h1 className="font-display text-3xl font-bold">Results</h1>
-        <Button onClick={download} disabled={scores.length === 0}>
-          Download report card
-        </Button>
+    <div className="space-y-5 sm:space-y-6">
+      <PageHeader
+        title="Results"
+        subtitle={
+          scores.length > 0
+            ? `${String(report["term"] ?? scores[0]?.["term"] ?? "")} · ${String(
+                report["session"] ?? scores[0]?.["session"] ?? "",
+              )}`
+            : undefined
+        }
+        action={
+          <Button
+            className="w-full sm:w-auto"
+            onClick={download}
+            disabled={scores.length === 0}
+          >
+            Download report card
+          </Button>
+        }
+      />
+
+      {/* Mobile: card list */}
+      <div className="space-y-3 sm:hidden">
+        {scores.length === 0 ? (
+          <p className="rounded-lg border border-border bg-card p-4 text-center text-sm text-muted-foreground">
+            No results published yet.
+          </p>
+        ) : null}
+        {scores.map((s) => (
+          <div
+            key={`m-${String(s["id"])}`}
+            className="rounded-lg border border-border bg-card p-3"
+          >
+            <div className="grid grid-cols-[minmax(0,1fr)_auto] items-start gap-2">
+              <p className="min-w-0 break-words font-medium">{String(s["subject"])}</p>
+              <span className="shrink-0 rounded bg-secondary px-2 py-0.5 text-xs font-semibold">
+                {String(s["grade"] ?? "-")}
+              </span>
+            </div>
+            <dl className="mt-2 grid grid-cols-4 gap-2 text-center text-xs">
+              {[
+                ["CA1", s["ca1_score"]],
+                ["CA2", s["ca2_score"]],
+                ["Exam", s["exam_score"]],
+                ["Total", s["total_score"]],
+              ].map(([label, val]) => (
+                <div key={String(label)} className="rounded bg-muted/50 py-1.5">
+                  <dt className="text-[10px] uppercase tracking-wide text-muted-foreground">
+                    {String(label)}
+                  </dt>
+                  <dd className="font-semibold">{String(val ?? "-")}</dd>
+                </div>
+              ))}
+            </dl>
+          </div>
+        ))}
       </div>
 
-      <div className="overflow-x-auto rounded-lg border border-border">
-        <table className="w-full text-sm">
+      <div className="hidden overflow-x-auto rounded-lg border border-border sm:block">
+        <table className="w-full min-w-[34rem] text-sm">
           <thead className="bg-secondary text-left">
             <tr>
               {["Subject", "CA1", "CA2", "Exam", "Total", "Grade"].map((h) => (
@@ -121,7 +172,7 @@ function ResultsPage() {
           <tbody>
             {scores.map((s) => (
               <tr key={String(s["id"])} className="border-t border-border">
-                <td className="px-3 py-2">{String(s["subject"])}</td>
+                <td className="px-3 py-2 whitespace-nowrap">{String(s["subject"])}</td>
                 <td className="px-3 py-2">{String(s["ca1_score"] ?? "-")}</td>
                 <td className="px-3 py-2">{String(s["ca2_score"] ?? "-")}</td>
                 <td className="px-3 py-2">{String(s["exam_score"] ?? "-")}</td>
