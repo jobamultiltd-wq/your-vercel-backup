@@ -79,7 +79,7 @@ function ParentFees() {
   async function pay(payAmount: number, invoiceId?: string) {
     setBusy(true);
     const res = await startFeePayment({
-      data: { amount: payAmount, ...(invoiceId ? { invoiceId } : {}), note: note || undefined },
+      data: { amount: payAmount, ...(invoiceId ? { invoiceId } : {}), ...(note ? { note } : {}) },
     });
     setBusy(false);
     if (!res.ok) {
