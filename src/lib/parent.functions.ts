@@ -168,7 +168,15 @@ export const parentResults = createServerFn({ method: "GET" }).handler(async () 
     db.from("attendance_records").select("*").eq("admission_id", id),
     db.from("admissions").select("gender, age, date_of_birth").eq("id", id).maybeSingle(),
   ]);
+  const { isClassPublished } = await import("./results.functions");
+  const latest = (scores.data ?? [])[0] as Record<string, unknown> | undefined;
+  const published = await isClassPublished(
+    String(profile.data?.["class_level"] ?? parent.classLevel ?? ""),
+    String(latest?.["session"] ?? ""),
+    String(latest?.["term"] ?? ""),
+  );
   return {
+    published,
     scores: scores.data ?? [],
     reports: reports.data ?? [],
     profile: profile.data ? { ...profile.data, ...(admission.data ?? {}) } : admission.data,

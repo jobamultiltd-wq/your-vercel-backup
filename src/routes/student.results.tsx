@@ -31,7 +31,7 @@ function ResultsPage() {
 
   if (isLoading || !data) return <p className="text-muted-foreground">Loading results…</p>;
 
-  if (settings && !settings.settings.portal.resultsPublished) {
+  if (!data.published) {
     return (
       <div className="rounded-lg border border-border bg-card p-6">
         <h1 className="font-display text-2xl font-bold">Results</h1>

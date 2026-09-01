@@ -332,7 +332,15 @@ export const studentResults = createServerFn({ method: "GET" }).handler(async ()
       .eq("id", user.id!)
       .maybeSingle(),
   ]);
+  const { isClassPublished } = await import("./results.functions");
+  const latest = (scores.data ?? [])[0] as Record<string, unknown> | undefined;
+  const published = await isClassPublished(
+    String(profile.data?.["class_level"] ?? user.classLevel ?? ""),
+    String(latest?.["session"] ?? ""),
+    String(latest?.["term"] ?? ""),
+  );
   return {
+    published,
     scores: scores.data ?? [],
     reports: reports.data ?? [],
     profile: profile.data ? { ...profile.data, ...(admission.data ?? {}) } : admission.data,
@@ -861,7 +869,7 @@ export const getPortalSettings = createServerFn({ method: "GET" }).handler(async
 });
 
 export const savePortalSettings = createServerFn({ method: "POST" })
-  .inputValidator((d: { key: "school" | "academic" | "portal"; value: Record<string, unknown> }) => d)
+  .inputValidator((d: { key: "school" | "academic" | "portal" | "results"; value: Record<string, unknown> }) => d)
   .handler(async ({ data }) => {
     const { getDb, requireAdmin } = await import("./portal.server");
     try {
