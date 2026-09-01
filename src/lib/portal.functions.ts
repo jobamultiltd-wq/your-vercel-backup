@@ -395,8 +395,7 @@ export const updateAdmission = createServerFn({ method: "POST" })
     const { data: row, error } = await db
       .from("admissions")
       .update({
-        application_status: data.application_status,
-        status: data.application_status,
+        payment_status: data.application_status,
         updated_at: new Date().toISOString(),
       })
       .eq("id", data.id)
@@ -439,14 +438,12 @@ export const enrollStudent = createServerFn({ method: "POST" })
         admission_id: adm["id"],
         student_email: email,
         guardian_email: adm["guardian_email"],
-        guardian_phone: adm["guardian_phone"],
         first_name: adm["first_name"],
         last_name: adm["surname"],
         class_level: adm["class_applying_for"],
         specialized_track: adm["specialized_track"],
         schooling_option: adm["schooling_option"],
         portal_password_hash: password,
-        is_activated: true,
         updated_at: new Date().toISOString(),
       },
       { onConflict: "admission_id" },
