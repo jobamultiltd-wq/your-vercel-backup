@@ -29,7 +29,7 @@ export const Route = createFileRoute("/admissions")({
   component: AdmissionsPage,
 });
 
-const CLASSES = [
+const FALLBACK_CLASSES = [
   "JSS 1",
   "JSS 2",
   "JSS 3",
@@ -37,6 +37,7 @@ const CLASSES = [
   "SSS 2",
   "SSS 3",
 ];
+
 
 function Field({
   name,
