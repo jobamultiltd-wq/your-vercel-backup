@@ -15,6 +15,7 @@ import {
   saveStaffMember,
   setStaffStatus,
 } from "@/lib/portal.functions";
+import { CAPABILITIES, CAPABILITY_LABELS, can } from "@/lib/permissions";
 import { DEFAULT_SETTINGS, SETTINGS_TABLE_SQL, STAFF_ROLES } from "@/lib/settings";
 import type { AcademicSettings, PortalToggles, SchoolSettings } from "@/lib/settings";
 
