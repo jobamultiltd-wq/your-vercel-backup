@@ -42,6 +42,7 @@ import { Route as StudentFeesRouteImport } from './routes/student.fees'
 import { Route as StudentResultsRouteImport } from './routes/student.results'
 import { Route as StudentSubjectsRouteImport } from './routes/student.subjects'
 import { Route as ApiPublicFlutterwaveRouteImport } from './routes/api/public/flutterwave'
+import { Route as LovableEmailTransactionalPreviewRouteImport } from './routes/lovable/email/transactional/preview'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -208,6 +209,12 @@ const ApiPublicFlutterwaveRoute = ApiPublicFlutterwaveRouteImport.update({
   path: '/api/public/flutterwave',
   getParentRoute: () => rootRouteImport,
 } as any)
+const LovableEmailTransactionalPreviewRoute =
+  LovableEmailTransactionalPreviewRouteImport.update({
+    id: '/lovable/email/transactional/preview',
+    path: '/lovable/email/transactional/preview',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -243,6 +250,7 @@ export interface FileRoutesByFullPath {
   '/staff/': typeof StaffIndexRoute
   '/student/': typeof StudentIndexRoute
   '/api/public/flutterwave': typeof ApiPublicFlutterwaveRoute
+  '/lovable/email/transactional/preview': typeof LovableEmailTransactionalPreviewRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -275,6 +283,7 @@ export interface FileRoutesByTo {
   '/staff': typeof StaffIndexRoute
   '/student': typeof StudentIndexRoute
   '/api/public/flutterwave': typeof ApiPublicFlutterwaveRoute
+  '/lovable/email/transactional/preview': typeof LovableEmailTransactionalPreviewRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -311,6 +320,7 @@ export interface FileRoutesById {
   '/staff/': typeof StaffIndexRoute
   '/student/': typeof StudentIndexRoute
   '/api/public/flutterwave': typeof ApiPublicFlutterwaveRoute
+  '/lovable/email/transactional/preview': typeof LovableEmailTransactionalPreviewRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -348,6 +358,7 @@ export interface FileRouteTypes {
     | '/staff/'
     | '/student/'
     | '/api/public/flutterwave'
+    | '/lovable/email/transactional/preview'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -380,6 +391,7 @@ export interface FileRouteTypes {
     | '/staff'
     | '/student'
     | '/api/public/flutterwave'
+    | '/lovable/email/transactional/preview'
   id:
     | '__root__'
     | '/'
@@ -415,6 +427,7 @@ export interface FileRouteTypes {
     | '/staff/'
     | '/student/'
     | '/api/public/flutterwave'
+    | '/lovable/email/transactional/preview'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -428,6 +441,7 @@ export interface RootRouteChildren {
   StudentRoute: typeof StudentRouteWithChildren
   TrackRoute: typeof TrackRoute
   ApiPublicFlutterwaveRoute: typeof ApiPublicFlutterwaveRoute
+  LovableEmailTransactionalPreviewRoute: typeof LovableEmailTransactionalPreviewRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -663,6 +677,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicFlutterwaveRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/lovable/email/transactional/preview': {
+      id: '/lovable/email/transactional/preview'
+      path: '/lovable/email/transactional/preview'
+      fullPath: '/lovable/email/transactional/preview'
+      preLoaderRoute: typeof LovableEmailTransactionalPreviewRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -749,6 +770,7 @@ const rootRouteChildren: RootRouteChildren = {
   StudentRoute: StudentRouteWithChildren,
   TrackRoute: TrackRoute,
   ApiPublicFlutterwaveRoute: ApiPublicFlutterwaveRoute,
+  LovableEmailTransactionalPreviewRoute: LovableEmailTransactionalPreviewRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
